@@ -1,0 +1,49 @@
+import { useEffect, useState } from "react";
+import { Text, View } from "react-native";
+
+interface ElapsedTimerProps {
+  startTimestamp: number // Unix epoch timestamp in milliseconds
+  title?: string
+  description?: string
+  textColor?: string
+}
+
+export function Timer({ startTimestamp, title = "Elapsed Time", description, textColor = "text-black" }: ElapsedTimerProps) {
+  const [elapsedTime, setElapsedTime] = useState("");
+
+  useEffect(() => {
+    const updateElapsedTime = () => {
+      const now = Date.now();
+      const elapsed = now - startTimestamp;
+
+      if (elapsed < 0) {
+        setElapsedTime("Timer not started yet");
+        return;
+      }
+
+      const seconds = Math.floor((elapsed / 1000) % 60);
+      const minutes = Math.floor((elapsed / (1000 * 60)) % 60);
+      const hours = Math.floor((elapsed / (1000 * 60 * 60)) % 24);
+      const days = Math.floor(elapsed / (1000 * 60 * 60 * 24));
+
+      const parts = [];
+      if (days > 0) parts.push(`${days}d`);
+      if (hours > 0 || days > 0) parts.push(`${hours.toString().padStart(2, "0")}h`);
+      if (minutes > 0 || hours > 0 || days > 0) parts.push(`${minutes.toString().padStart(2, "0")}m`);
+      parts.push(`${seconds.toString().padStart(2, "0")}s`);
+
+      setElapsedTime(parts.join(" "));
+    };
+
+    updateElapsedTime();
+    const interval = setInterval(updateElapsedTime, 1000);
+
+    return () => clearInterval(interval);
+  }, [startTimestamp]);
+
+  return (
+    <View className={`text-xl font-mono font-bold text-center tabular-nums ${textColor}`}>
+      <Text>{elapsedTime}</Text>
+    </View>
+  );
+}
