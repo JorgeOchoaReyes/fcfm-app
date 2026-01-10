@@ -21,12 +21,12 @@ export function ItemController({
   timestampStarted,
 }: ItemControllerProps) {
   return (
-    <View className={"w-full max-w-sm mx-auto"}>
+    <View className={"w-[400px] max-w-sm mx-auto"}>
       <View className="bg-white rounded-2xl shadow-lg overflow-hidden">
-        <View className="bg-gradient-to-r from-red-600 to-red-500 px-4 py-2 text-center relative">
+        <View className="bg-red-500 px-4 py-2 text-center relative">
           <Text className="text-white text-2xl font-bold mb-2">{item.name}</Text>
-          <View className="inline-block bg-green-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
-            <Text>{item.code}</Text>
+          <View className="flex items-center w-12 bg-green-600 w-content px-3 py-1 rounded-full text-sm font-semibold">
+            <Text className="text-white font-bold">{item.code}</Text>
           </View>
         </View>
         <View className="p-2">

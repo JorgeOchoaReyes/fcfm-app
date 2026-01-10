@@ -23,9 +23,6 @@ export default function Main() {
     >
       <View className="flex min-h-screen w-full flex-col items-center justify-between">
         <View className="px-4 py-8 min-h-screen">
-          <View className="text-2xl font-semibold text-center mb-4 text-black">
-            <Text>Kitchen Display System</Text>
-          </View>
           <KDS
             items={listActive()}
             history={listHistory()}

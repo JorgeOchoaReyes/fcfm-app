@@ -1,7 +1,8 @@
 import { ItemController } from "../components/item-controller"; 
 import { items } from "../util/constants"; 
 import { usePriorityQueue } from "../hooks/usePriority-Queue"; 
-import { View, Text } from "react-native"; 
+import { View, Text } from "react-native";
+import { KDS } from "../components/kds"; 
 
 export default function Home() {
 
@@ -21,14 +22,23 @@ export default function Home() {
 
   return (
     <View
-      className={`flex min-h-screen items-center justify-center font-sans`}
+      className={`flex min-h-screen font-sans max-w-full`}
     >
-      <View className="flex min-h-screen w-full flex-col items-center justify-between">
-        <View className="px-4 py-8 min-h-screen">
-          <View className="text-2xl font-semibold text-center my-4 text-black">
-            <Text>Steam Table Controllers</Text>
-          </View>
-          <View className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <View className="flex flex-col justify-between">
+        <KDS
+                     items={listActive()}
+                     history={listHistory()}
+                     onRecall={(id: number) => {
+                       recall(id);
+                     }}
+                     onDelete={(code: string) => {
+                       remove(code);
+                     }}
+                     onUpdateStatus={(code: string, status?: "pending" | "in-progress" | "completed") => {
+                       updateStatus(code,);
+                     }}
+                   /> 
+          <View className="grid grid-cols-3 gap-4 flex-1">
             {
               items.map(item => {
                 const itemWaiting = pq.waitingTracker.has(item.code);
@@ -56,8 +66,7 @@ export default function Home() {
                 />;
               })
             }
-          </View>
-        </View>
+          </View> 
       </View>
     </View>
   );
