@@ -93,7 +93,7 @@ export const KDS = ({
 }: KDSProps) => {
   const [showHistory, setShowHistory] = useState(false);
   return (
-    <View className="rounded-2xl bg-slate-50 min-h-120 max-h-120 w-s p-6 shadow-md overflow-auto">
+    <View className="rounded-2xl bg-slate-50 min-h-120 max-h-120 p-6 shadow-md overflow-auto">
       <TouchableOpacity
         onPress={() => setShowHistory(!showHistory)}
         className="rounded-md cursor-pointer hover:bg-slate-300 bg-slate-200 text-black flex items-center text-sm p-2 align-end ml-auto mb-6">
