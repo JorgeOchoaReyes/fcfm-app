@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "my-expo-app",
-    "slug": "my-expo-app",
+    "name": "fcfm",
+    "slug": "fcfm",
     "version": "1.0.0",
     "web": {
       "favicon": "./assets/favicon.png"
@@ -32,6 +32,13 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       }
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "bbf77683-b3b5-4cc3-b592-1c76e38e8f75"
+      }
+    },
+    "owner": "panda-express"
   }
 }

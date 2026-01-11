@@ -1,7 +1,7 @@
-import { ItemController } from "../components/item-controller"; 
+import { ItemController } from "../components/Item-Controller"; 
 import { items } from "../util/constants"; 
 import { usePriorityQueue } from "../hooks/usePriority-Queue"; 
-import { View, Text } from "react-native";
+import { View, FlatList } from "react-native";
 import { KDS } from "../components/kds"; 
 
 export default function Home() {
@@ -21,29 +21,32 @@ export default function Home() {
 
 
   return (
-    <View
-      className={"flex min-h-screen font-sans max-w-full"}
-    >
-      <View className="flex flex-col justify-between">
-        <KDS
-          items={listActive()}
-          history={listHistory()}
-          onRecall={(id: number) => {
-            recall(id);
-          }}
-          onDelete={(code: string) => {
-            remove(code);
-          }}
-          onUpdateStatus={(code: string, status?: "pending" | "in-progress" | "completed") => {
-            updateStatus(code,);
-          }}
-        /> 
-        <View className="grid grid-cols-3 gap-4 flex-1">
-          {
-            items.map(item => {
+    <View className={"flex font-sans"}>
+      <View className="flex flex-col h-screen justify-between">
+        <View className="flex">
+          <KDS
+            items={listActive()}
+            history={listHistory()}
+            onRecall={(id: number) => {
+              recall(id);
+            }}
+            onDelete={(code: string) => {
+              remove(code);
+            }}
+            onUpdateStatus={(code: string, status?: "pending" | "in-progress" | "completed") => {
+              updateStatus(code,);
+            }}
+          /> 
+        </View>  
+        <View className="flex flex-row pb-10 overflow-auto">  
+          <FlatList
+            keyExtractor={(item) => item.code}
+            numColumns={4}  
+            data={items} 
+            scrollEnabled
+            renderItem={({ item }) => {
               const itemWaiting = pq.waitingTracker.has(item.code);
               const itemInQueue = findItem(item.name);
-
               return <ItemController
                 key={item.code}
                 item={item}
@@ -64,9 +67,9 @@ export default function Home() {
                 }}
                 timestampStarted={itemInQueue?.createdAt}
               />;
-            })
-          }
-        </View> 
+            }}
+          />  
+        </View>
       </View>
     </View>
   );
