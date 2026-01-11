@@ -1,6 +1,6 @@
 import type { ItemViewType } from "../util/constants";
-import { LED } from "./led";
-import { Timer } from "./timer";
+import { LED } from "./LED";
+import { Timer } from "./Timer";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
 export interface ItemControllerProps {

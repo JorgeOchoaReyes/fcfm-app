@@ -6,9 +6,16 @@ interface ElapsedTimerProps {
   title?: string
   description?: string
   textColor?: string
+  textSize?: string
 }
 
-export function Timer({ startTimestamp, title = "Elapsed Time", description, textColor = "text-black" }: ElapsedTimerProps) {
+export function Timer({ 
+  startTimestamp,
+  title = "Elapsed Time",
+  description,
+  textColor = "text-black",
+  textSize = "text-md"
+}: ElapsedTimerProps) {
   const [elapsedTime, setElapsedTime] = useState("");
 
   useEffect(() => {
@@ -42,8 +49,8 @@ export function Timer({ startTimestamp, title = "Elapsed Time", description, tex
   }, [startTimestamp]);
 
   return (
-    <View className={`text-xl font-mono font-bold text-center tabular-nums ${textColor}`}>
-      <Text>{elapsedTime}</Text>
+    <View className={`font-mono font-bold text-center tabular-nums ${textColor}`}>
+      <Text className={textSize}>{elapsedTime}</Text>
     </View>
   );
 }

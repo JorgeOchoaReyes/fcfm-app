@@ -2,7 +2,7 @@ import { ItemController } from "../components/Item-Controller";
 import { items } from "../util/constants"; 
 import { usePriorityQueue } from "../hooks/usePriority-Queue"; 
 import { View, FlatList } from "react-native";
-import { KDS } from "../components/kds"; 
+import { KDS } from "../components/KDS"; 
 
 export default function Home() {
 
