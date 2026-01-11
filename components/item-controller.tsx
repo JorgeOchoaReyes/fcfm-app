@@ -21,11 +21,11 @@ export function ItemController({
   timestampStarted,
 }: ItemControllerProps) {
   return (
-    <View className={"w-[400px] max-w-sm mx-auto"}>
+    <View className={"w-[300px] p-1 mx-auto"}>
       <View className="bg-white rounded-2xl shadow-lg overflow-hidden">
         <View className="bg-red-500 px-4 py-2 text-center relative">
           <Text className="text-white text-2xl font-bold mb-2">{item.name}</Text>
-          <View className="flex items-center w-12 bg-green-600 w-content px-3 py-1 rounded-full text-sm font-semibold">
+          <View className="flex items-center w-16 bg-green-600 w-content px-4 py-1 rounded-full text-sm font-semibold">
             <Text className="text-white font-bold">{item.code}</Text>
           </View>
         </View>
@@ -59,32 +59,43 @@ export function ItemController({
               {/* Label row */}
               <View style={styles.row}>
                 <View style={styles.cell}>
-                  <Text style={styles.headerText}>#1 Srv</Text>
+                  <Text style={styles.headerText}>#1</Text>
                 </View>
                 <View style={styles.cell}>
-                  <Text style={styles.headerText}>#2 Srv</Text>
+                  <Text style={styles.headerText}>#2</Text>
                 </View>
                 <View style={styles.cell}>
-                  <Text style={styles.headerText}>#3 Srv</Text>
+                  <Text style={styles.headerText}>#3</Text>
+                </View>
+                <View style={styles.cell}>
+                  <Text style={styles.headerText}></Text>
                 </View>
               </View>
 
               {/* Data row */}
               <View style={styles.row}>
                 <View style={styles.cell}>
-                  <Text style={styles.valueText}>{item.batchServings[1]}</Text>
+                  <Text style={styles.valueText}>{item.batchServings[1].toFixed(1)}</Text>
                 </View>
                 <View style={styles.cell}>
-                  <Text style={styles.valueText}>{item.batchServings[2]}</Text>
+                  <Text style={styles.valueText}>{item.batchServings[2].toFixed(1)}</Text>
                 </View>
                 <View style={styles.cell}>
-                  <Text style={styles.valueText}>{item.batchServings[3]}</Text>
+                  <Text style={styles.valueText}>{item.batchServings[3].toFixed(1)}</Text>
+                </View>
+                <View style={styles.cell}>
+                  <Text style={styles.valueText}></Text>
                 </View>
               </View>
             </View>
           </View>
           {
-            timestampStarted ? <View className="mt-5"><Timer startTimestamp={timestampStarted} /></View> : null
+            timestampStarted ? <View className="mt-5 flex flex-row justify-center items-center">
+              <Text className="text-gray-900 font-semibold">
+                Cooking: 
+                {/* TODO: Add status based on item status, ie if in progress say in progress, if in queue say queued */} 
+              </Text>
+              <Timer startTimestamp={timestampStarted} /></View> : null
           }
           <Text className="text-center text-gray-900 font-semibold mt-6">
             Cook time: {item.cookTime}
@@ -94,7 +105,6 @@ export function ItemController({
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   table: {

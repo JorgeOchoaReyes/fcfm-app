@@ -36,7 +36,6 @@ export default function Main() {
               updateStatus(code,);
             }}
           />
-
         </View>
       </View>
     </View>

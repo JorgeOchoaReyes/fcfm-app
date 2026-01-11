@@ -46,10 +46,6 @@ export const usePriorityQueue = () => {
 
   const [date, setDate] = useState<number>(Date.now());
 
-  const [storeNumber, setStoreNumber] = useState<string>("845");
-
- 
-
   const onChangePriorityQueue = async (newPq: PriorityQueue) => {
     const turnLinkedListToArray = (head: Node | null) => {
       const items: Item[] = [];
@@ -70,6 +66,8 @@ export const usePriorityQueue = () => {
       instanceTracker: newPq.instanceTracker,
       waitingTracker: newPq.waitingTracker
     } as PriorityQueueStorage; 
+
+    return pqStorage; 
 
   };
 
