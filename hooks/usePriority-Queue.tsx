@@ -65,11 +65,11 @@ export const usePriorityQueue = () => {
 
     const items = turnLinkedListToArray(newPq.head);
     const pqStorage = {
-        linkedList: items,
-        history: newPq.history,
-        instanceTracker: newPq.instanceTracker,
-        waitingTracker: newPq.waitingTracker
-    } as PriorityQueueStorage 
+      linkedList: items,
+      history: newPq.history,
+      instanceTracker: newPq.instanceTracker,
+      waitingTracker: newPq.waitingTracker
+    } as PriorityQueueStorage; 
 
   };
 

@@ -19,7 +19,7 @@ export default function Main() {
 
   return (
     <View
-      className={`flex min-h-screen items-center justify-center font-sans`}
+      className={"flex min-h-screen items-center justify-center font-sans"}
     >
       <View className="flex min-h-screen w-full flex-col items-center justify-between">
         <View className="px-4 py-8 min-h-screen">
