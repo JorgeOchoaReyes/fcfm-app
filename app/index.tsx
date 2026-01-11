@@ -1,8 +1,8 @@
-import KDS from 'views/kds'; 
-import STC from 'views/stc';
-import '../global.css';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { ScrollView } from 'react-native';
+import KDS from "views/kds"; 
+import STC from "views/stc";
+import "../global.css";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ScrollView } from "react-native";
 
 
 

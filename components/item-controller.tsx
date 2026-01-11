@@ -32,56 +32,56 @@ export function ItemController({
         <View className="p-2">
           <View className=" rounded-lg overflow-hidden">
             <View style={styles.table}>
-      {/* Header row */}
-      <View style={styles.row}>
-        {[1, 2, 3].map((n) => (
-          <View key={n} style={styles.cell}>
-            <TouchableOpacity
-              style={styles.redButton}
-              onPress={() => onClickAdd(n)}
-            >
-              <Text style={styles.buttonText}>{n}</Text>
-            </TouchableOpacity>
-          </View>
-        ))}
+              {/* Header row */}
+              <View style={styles.row}>
+                {[1, 2, 3].map((n) => (
+                  <View key={n} style={styles.cell}>
+                    <TouchableOpacity
+                      style={styles.redButton}
+                      onPress={() => onClickAdd(n)}
+                    >
+                      <Text style={styles.buttonText}>{n}</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
 
-        <View style={[styles.cell, styles.center]}>
-          <LED state={waiting ? "on" : "off"} pulse={waiting} />
-          <TouchableOpacity
-            style={[styles.warningButton, { marginTop: 8 }]}
-            onPress={() => onClickMarkWaiting(item.code)}
-          >
-            <Text style={styles.buttonText}>W</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+                <View style={[styles.cell, styles.center]}>
+                  <LED state={waiting ? "on" : "off"} pulse={waiting} />
+                  <TouchableOpacity
+                    style={[styles.warningButton, { marginTop: 8 }]}
+                    onPress={() => onClickMarkWaiting(item.code)}
+                  >
+                    <Text style={styles.buttonText}>W</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
 
-      {/* Label row */}
-      <View style={styles.row}>
-        <View style={styles.cell}>
-          <Text style={styles.headerText}>#1 Srv</Text>
-        </View>
-        <View style={styles.cell}>
-          <Text style={styles.headerText}>#2 Srv</Text>
-        </View>
-        <View style={styles.cell}>
-          <Text style={styles.headerText}>#3 Srv</Text>
-        </View>
-      </View>
+              {/* Label row */}
+              <View style={styles.row}>
+                <View style={styles.cell}>
+                  <Text style={styles.headerText}>#1 Srv</Text>
+                </View>
+                <View style={styles.cell}>
+                  <Text style={styles.headerText}>#2 Srv</Text>
+                </View>
+                <View style={styles.cell}>
+                  <Text style={styles.headerText}>#3 Srv</Text>
+                </View>
+              </View>
 
-      {/* Data row */}
-      <View style={styles.row}>
-        <View style={styles.cell}>
-          <Text style={styles.valueText}>{item.batchServings[1]}</Text>
-        </View>
-        <View style={styles.cell}>
-          <Text style={styles.valueText}>{item.batchServings[2]}</Text>
-        </View>
-        <View style={styles.cell}>
-          <Text style={styles.valueText}>{item.batchServings[3]}</Text>
-        </View>
-      </View>
-    </View>
+              {/* Data row */}
+              <View style={styles.row}>
+                <View style={styles.cell}>
+                  <Text style={styles.valueText}>{item.batchServings[1]}</Text>
+                </View>
+                <View style={styles.cell}>
+                  <Text style={styles.valueText}>{item.batchServings[2]}</Text>
+                </View>
+                <View style={styles.cell}>
+                  <Text style={styles.valueText}>{item.batchServings[3]}</Text>
+                </View>
+              </View>
+            </View>
           </View>
           {
             timestampStarted ? <View className="mt-5"><Timer startTimestamp={timestampStarted} /></View> : null
