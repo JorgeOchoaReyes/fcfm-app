@@ -1,4 +1,4 @@
-import { KDS } from "../components/kds";
+import { KDS } from "../components/KDS";
 import { usePriorityQueue } from "../hooks/usePriority-Queue"; 
 import { View, Text } from "react-native";
 
@@ -18,9 +18,7 @@ export default function Main() {
   } = usePriorityQueue(); 
 
   return (
-    <View
-      className={"flex min-h-screen items-center justify-center font-sans"}
-    >
+    <View className={"flex min-h-screen items-center justify-center font-sans bg-slate-100"}>
       <View className="flex min-h-screen w-full flex-col items-center justify-between">
         <View className="px-4 py-8 min-h-screen">
           <KDS

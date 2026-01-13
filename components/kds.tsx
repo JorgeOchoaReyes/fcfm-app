@@ -1,15 +1,14 @@
 import { Item } from "../types";
 import { Ionicons } from "@expo/vector-icons";
-import { Timer } from "./timer";
+import { Timer } from "./Timer";
 import { useState } from "react";
-import { View , TouchableOpacity, Text }  from "react-native"; 
-
+import { View, TouchableOpacity, Text }  from "react-native"; 
 
 const assignBgTheme = (item: Item): string => {
   let theme = "";
   switch (item.status) {
   case "pending":
-    theme = "text-black";
+    theme = "text-black bg-white";
     break;
   case "in-progress":
     theme = "bg-yellow-500";
@@ -46,10 +45,7 @@ const KDSItemView = ({
 
   return (
     <TouchableOpacity
-      className={`flex flex-row justify-around gap-4 mb-4 p-4 rounded-lg shadow 
-        ${completed ? "bg-slate-200 text-black" :
-      assignBgTheme(item)}  
-      `}
+      className={`flex flex-row justify-around gap-4 m-4 p-6 rounded-3xl border border-slate-500 ${completed ? "bg-slate-200 text-black" : assignBgTheme(item)}`}
       onPress={() => {
         if (completed) {
           onRecall(item.id);
@@ -57,13 +53,19 @@ const KDSItemView = ({
           updateStatus(item.code,);
         }
       }}>
-      <View className="col-span-2 font-semibold text-2xl"><Text>{item.code}</Text></View>
-      <View className="text-center text-2xl"><Text>#{item.batchSize}</Text></View>
+      <View className="col-span-2 font-semibold"><Text className="text-3xl">{item.name}</Text></View>
+      <View className="text-center"><Text className="text-3xl">#{item.batchSize}</Text></View>
       {
-        completed ? null : <View className="text-center text-2xl"><Timer textColor={active ? "text-white" : "text-black"} startTimestamp={item.createdAt} /></View>
+        completed ? null : <View className="text-center text-2xl">
+          <Timer 
+            textSize="text-3xl"
+            textColor={active ? "text-white" : "text-black"} 
+            startTimestamp={item.createdAt} 
+          />
+        </View>
       }
-      <View className="text-center text-2xl"><Text>{item.waiting ? "⚠️" : " "}</Text></View>
-      <View className="text-center text-2xl"><Text>{item.status}</Text></View>
+      <View className="text-center"><Text className="text-3xl">{item.waiting ? "⚠️" : " "}</Text></View>
+      <View className="text-center"><Text className="text-3xl">{item.status}</Text></View>
       <TouchableOpacity onPress={() => {
         if (completed) return;
         onDelete(item.code);
