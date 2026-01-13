@@ -9,7 +9,9 @@
     "lint": "eslint \"**/*.{js,jsx,ts,tsx}\" && prettier -c \"**/*.{js,jsx,ts,tsx,json}\"",
     "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
     "web": "expo start --web",
-    "clear-cache": "expo start --clear"
+    "clear-cache": "expo start --clear",
+    "dev-build": "npx expo run:android",
+    "apk": "eas build --profile development --platform android"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -17,7 +19,9 @@
     "babel-preset-expo": "^54.0.9",
     "expo": "^54.0.0",
     "expo-constants": "~18.0.13",
+    "expo-dev-client": "~6.0.20",
     "expo-linking": "~8.0.11",
+    "expo-nearby-connections": "^1.0.0",
     "expo-router": "~6.0.21",
     "expo-status-bar": "~3.0.9",
     "nativewind": "latest",
