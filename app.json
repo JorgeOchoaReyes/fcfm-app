@@ -29,6 +29,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.jorgeochoareyes.fcfm",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
