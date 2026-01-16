@@ -36,7 +36,7 @@ export const useNearbySync = (userName: string) => {
       // If no preferred device is set, auto-accept everyone (simplest for 2 users).
       if (!preferredPeerId || event.peerId === preferredPeerId) {
         Nearby.acceptConnection(event.peerId);
-      }
+      } 
     });
 
     // B. Peer Found (Auto-Connect)
