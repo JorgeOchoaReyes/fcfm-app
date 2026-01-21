@@ -1,26 +1,6 @@
 import type { Item } from "../types/index";
 import { useCallback, useState } from "react"; 
 
-class Node {
-  next: Node | null = null;
-  prev: Node | null = null;
-
-  value: Item | null = null;
-
-  constructor(value: Item | null, prev: Node | null = null, next: Node | null = null) {
-    this.next = next;
-    this.prev = prev;
-    this.value = value;
-  }
-}
-
-class PriorityQueueStorage {
-  linkedList: Item[] = [];
-  history: Item[] = [];
-  instanceTracker: Map<string, boolean> = new Map();
-  waitingTracker: Map<string, boolean> = new Map();
-}
-
 class PriorityQueue { 
 
   pendingItems: Item[] = [];
@@ -43,18 +23,6 @@ class PriorityQueue {
 
 }
 
-const insertFn = (arr: Item[], item: Item, index: number) => {
-  const copy = [...arr];
-  copy.splice(index, 0, item);
-  return copy;
-};
-
-const removeFn = (arr: Item[], index: number) => {
-  const copy = [...arr];
-  copy.splice(index, 1);
-  return copy;
-};
-
 export const usePriorityQueue = () => {
   const [pq, setPq] = useState<PriorityQueue>(new PriorityQueue());
 
@@ -64,7 +32,6 @@ export const usePriorityQueue = () => {
     setPq(newPq);
   };  
 
-
   const add = (value: Item) => {
     if (pq.instanceTracker.has(value.code)) {
       alert("Item already in queue.");
@@ -72,14 +39,20 @@ export const usePriorityQueue = () => {
     }
     
     const copy = { ...pq }; 
-    copy.items.push(value);
+    if(value.status === "in-progress") {
+      copy.inProgressItems.push(value);
+    } else if(value.status === "waiting") {
+      copy.waitingItems.push(value);
+    } else {
+      copy.pendingItems.push(value);
+    }
     copy.instanceTracker.set(value.code, true);
     setPq(copy);
 
   };
 
   const listActive = () => {
-    return pq.items;
+    return [...pq.pendingItems, ...pq.inProgressItems, ...pq.waitingItems];
   };
 
   const listHistory = () => {
@@ -87,7 +60,7 @@ export const usePriorityQueue = () => {
   };
 
   const listAll = useCallback(() => { 
-    return [...pq.items, ...pq.history].sort((a, b) => a.createdAt - b.createdAt);
+    return [...pq.pendingItems, ...pq.inProgressItems, ...pq.waitingItems, ...pq.history].sort((a, b) => a.createdAt - b.createdAt);
   }, [pq]);
 
   const remove = (code: string) => {
@@ -97,12 +70,26 @@ export const usePriorityQueue = () => {
     }
     const copy = { ...pq };
  
-    const findIndex = copy.items.findIndex((item) => item.code === code);
-    if (findIndex === -1) {
-      alert("Item not in queue.");
-      return;
+    if(copy.pendingItems.find((item) => item.code === code)) {
+      copy.pendingItems = copy.pendingItems.filter((item) => item.code !== code);
+      copy.waitingTracker.delete(code);
+      copy.instanceTracker.delete(code); 
+      const item  = copy.pendingItems.find((item) => item.code === code);
+      copy.history.push(item!);
+    } else if(copy.inProgressItems.find((item) => item.code === code)) {
+      copy.inProgressItems = copy.inProgressItems.filter((item) => item.code !== code);
+      copy.waitingTracker.delete(code);
+      copy.instanceTracker.delete(code); 
+      const item  = copy.inProgressItems.find((item) => item.code === code);
+      copy.history.push(item!);
+    } else if(copy.waitingItems.find((item) => item.code === code)) {
+      copy.waitingItems = copy.waitingItems.filter((item) => item.code !== code);
+      copy.waitingTracker.delete(code);
+      copy.instanceTracker.delete(code); 
+      const item  = copy.waitingItems.find((item) => item.code === code);
+      copy.history.push(item!);
     }
-    copy.items = removeFn(copy.items, findIndex);
+
     copy.instanceTracker.delete(code);
     setPq(copy);
   };
@@ -152,46 +139,11 @@ export const usePriorityQueue = () => {
     targetCategory = getCategory(target);  
 
     if(targetCategory === "pending") {
-      copy.items.push(target);
+      copy.pendingItems.push(target);
     } else if (targetCategory === "in-progress") {
-      if(copy.items[0].status !== "in-progress") {
-        copy.items.unshift(target);
-      } 
-      else if(copy.items[copy.items.length - 1].status === "in-progress") {
-        copy.items.push(target);
-      } 
-      else {
-        for(let i = 0; i < copy.items.length; i++) {
-          if(copy.items[i].status !== "in-progress" ) {
-            copy.items.splice(i, 0, target);
-            break;
-          }
-        }
-      }
+      copy.inProgressItems.push(target);
     } else if (targetCategory === "waiting") {
-      if(copy.items[0].status === "pending") {
-        copy.items.unshift(target);
-      } 
-      else if(copy.items[copy.items.length - 1].status === "in-progress") {
-        copy.items.push(target);
-      } 
-      else if(copy.items[copy.items.length - 1].status === "waiting") {
-        copy.items.push(target);
-      } 
-      else {
-        for(let i = 0; i < copy.items.length; i++) {
-          if(copy.items[i].status === "in-progress" && copy.items[i+1].status === "pending") {
-            copy.items.splice(i, 0, target);
-            break;
-          } else if (copy.items[i].status === "in-progress" && (i+1 === copy.items.length)) {
-            copy.items.push(target);
-            break;
-          } else if (copy.items[i].status === "waiting" && copy.items[i+1].status === "pending") {
-            copy.items.splice(i, 0, target);
-            break;
-          } 
-        }
-      }
+      copy.waitingItems.push(target);
     }
 
     copy.instanceTracker.set(target.code, true);
@@ -206,66 +158,67 @@ export const usePriorityQueue = () => {
     }
 
     const copy = { ...pq };
-    let target = null as Item | null;
     
-    const findIndex = copy.items.findIndex((item) => item.code === code);
-    if (findIndex === -1) {
-      alert("Item not in queue.");
-      return;
-    }
-    target = copy.items[findIndex]; 
-
-    target.waiting = true;
-    target.status = "waiting";
-    target.markedWaitingAt = Date.now();
-
-    for(let i = 0; i < copy.items.length; i++) {
-      if(copy.items[i].code === code) {
-        copy.items.splice(i, 1);
-        break;
-      }
-    }
-
-    if(copy.items[0].status === "pending") {
-      copy.items.unshift(target);
-    } else if(copy.items[copy.items.length - 1].status === "in-progress" || copy.items[copy.items.length - 1].status === "waiting"  ) {
-      copy.items.push(target);
+    if(copy.pendingItems.find((item) => item.code === code)) {
+      console.log("Marking Item as Pending!");
+      const target = copy.pendingItems.find((item) => item.code === code);
+      target!.waiting = true;
+      target!.markedWaitingAt = Date.now();
+      copy.pendingItems = copy.pendingItems.filter((item) => item.code !== code);
+      copy.waitingItems.push(target!);
     } else {
-      for(let i = 0; i < copy.items.length; i++) {
-        if(copy.items[i].status === "in-progress" && copy.items[i+1].status === "pending") {
-          copy.items.splice(i, 0, target);
-          break;
-        } else if (copy.items[i].status === "in-progress" && (i+1 === copy.items.length)) {
-          copy.items.push(target);
-          break;
-        } else if (copy.items[i].status === "waiting" && copy.items[i+1].status === "pending") {
-          copy.items.splice(i, 0, target);
-          break;
-        } 
-      }
+      console.log("Item is waiting or in-progress");
     }
-
+    
     copy.waitingTracker.set(code, true);
     setPq({ ...copy });
   };
 
   const updateStatus = (code: string, status?: "pending" | "in-progress" | "completed") => {
     const copy = { ...pq };
-    let current = copy.head;
    
+    const itemInPending = copy.pendingItems.find((item) => item.code === code);
+    const itemInInProgress = copy.inProgressItems.find((item) => item.code === code); 
+    const itemInWaiting = copy.waitingItems.find((item) => item.code === code); 
 
+    if(itemInPending) {
+      copy.pendingItems = copy.pendingItems.filter((item) => item.code !== code);
+      itemInPending.status = "in-progress";
+      itemInPending.startedAt = Date.now();
+      copy.inProgressItems.push(itemInPending);
+    } else if(itemInInProgress) {
+      copy.inProgressItems = copy.inProgressItems.filter((item) => item.code !== code);
+      itemInInProgress.status = "completed";
+      itemInInProgress.completedAt = Date.now();
+      copy.waitingTracker.delete(code);
+      copy.instanceTracker.delete(code);
+      copy.history.push(itemInInProgress);
+    } else if(itemInWaiting) {
+      copy.waitingItems = copy.waitingItems.filter((item) => item.code !== code);
+      itemInWaiting.status = "in-progress";
+      itemInWaiting.startedAt = Date.now();
+      copy.inProgressItems.push(itemInWaiting);
+    }
 
     setPq({ ...copy });
   };
 
   const findItem = (name: string) => {
     const copy = { ...pq };
-    const findIndex = copy.items.findIndex((item) => item.name === name);
-    if (findIndex === -1) {
-      alert("Item not in queue.");
-      return;
-    }
-    return copy.items[findIndex];
+   
+    const itemInPending = copy.pendingItems.find((item) => item.name === name);
+    const itemInInProgress = copy.inProgressItems.find((item) => item.name === name);
+    const itemInWaiting = copy.waitingItems.find((item) => item.name === name); 
+
+    if(itemInPending) {
+      return itemInPending;
+    } else if(itemInInProgress) {
+      return itemInInProgress;
+    } else if(itemInWaiting) {
+      return itemInWaiting;
+    }  
+
+    return null;
   };
 
   return {
