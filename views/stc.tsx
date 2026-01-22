@@ -43,8 +43,7 @@ export default function Home() {
             numColumns={4}  
             data={items} 
             scrollEnabled
-            renderItem={({ item }) => {
-              const itemWaiting = pq.waitingTracker.has(item.code);
+            renderItem={({ item }) => { 
               const itemInQueue = findItem(item.name);
               return <ItemController
                 key={item.code}
@@ -60,7 +59,7 @@ export default function Home() {
                     code: item.code
                   });
                 }}
-                waiting={itemWaiting}
+                waiting={itemInQueue?.waiting ?? false}
                 onClickMarkWaiting={(code: string) => {
                   markWaiting(code);
                 }}

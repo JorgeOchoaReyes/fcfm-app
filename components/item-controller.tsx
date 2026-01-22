@@ -39,6 +39,7 @@ export function ItemController({
                     <TouchableOpacity
                       style={styles.redButton}
                       onPress={() => onClickAdd(n)}
+                      delayPressIn={0} 
                     >
                       <Text style={styles.buttonText}>{n}</Text>
                     </TouchableOpacity>
@@ -50,6 +51,7 @@ export function ItemController({
                   <TouchableOpacity
                     style={[styles.warningButton, { marginTop: 8 }]}
                     onPress={() => onClickMarkWaiting(item.code)}
+                    delayPressIn={0} 
                   >
                     <Text style={styles.buttonText}>W</Text>
                   </TouchableOpacity>

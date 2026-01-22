@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import * as Nearby from "expo-nearby-connections";
-import { useStorage } from "../hooks/useStorage";
+import { useStorageP2P } from "../hooks/useStorage";
 
 export const useNearbySync = (userName: string) => {
   const [connectedPeer, setConnectedPeer] = useState<string | null>(null);
   const [isSearching, setIsSearching] = useState(false);
-  const { preferredPeerId, syncWithPeer } = useStorage();
+  const { preferredPeerId, syncWithPeer } = useStorageP2P();
   
   const isConnected = useRef(false);
 

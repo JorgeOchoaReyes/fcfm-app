@@ -11,7 +11,7 @@
     "web": "expo start --web",
     "clear-cache": "expo start --clear",
     "dev-build": "npx expo run:android",
-    "apk": "eas build --profile development --platform android"
+    "apk": "eas build --profile production --platform android"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
