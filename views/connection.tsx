@@ -2,17 +2,17 @@ import React, { useState, useEffect } from "react";
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Nearby from "expo-nearby-connections";
-import { useStorage } from "../hooks/useStorage";
+import { useStorageP2P } from "../hooks/useStorage";
 
 export default function ConnectionPicker() {
   const [discoveredPeers, setDiscoveredPeers] = useState<{id: string, name: string}[]>([]);
-  const { preferredPeerId, setPreferredPeer } = useStorage();
+  const { preferredPeerId, setPreferredPeer } = useStorageP2P();
 
   useEffect(() => {
     const foundSub = Nearby.onPeerFound((event) => {
       setDiscoveredPeers(prev => {
         if (prev.find(p => p.id === event.peerId)) return prev;
-        return [...prev, { id: event.peerId, name: event.peerId }];
+        return [...prev, { id: event.peerId, name: event.name }];
       });
  
       if (event.peerId === preferredPeerId) {
@@ -25,8 +25,8 @@ export default function ConnectionPicker() {
     });
 
     return () => {
-    //   foundSub.remove();
-    //   lostSub.remove();
+      foundSub();
+      lostSub();
     };
   }, [preferredPeerId]);
 

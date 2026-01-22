@@ -9,13 +9,22 @@ export default function App() {
     <>
       <Stack.Screen />
       <SafeAreaView style={styles.container}>    
-        <TouchableOpacity onPress={() => router.push("/kds")} style={styles.bigButtonBOH}>
+        <TouchableOpacity 
+          delayPressIn={0} 
+          onPress={() => router.push("/kds")} 
+          style={styles.bigButtonBOH}>
           <Text style={styles.buttonText}>BOH</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push("/stc")} style={styles.bigButtonFOH}>
+        <TouchableOpacity 
+          delayPressIn={0} 
+          onPress={() => router.push("/stc")} 
+          style={styles.bigButtonFOH}>
           <Text style={styles.buttonText}>FOH</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push("/settings")} style={styles.bigButtonSettings}>
+        <TouchableOpacity 
+          delayPressIn={0} 
+          onPress={() => router.push("/settings")} 
+          style={styles.bigButtonSettings}>
           <Text style={styles.buttonText}>Settings</Text>
         </TouchableOpacity>
       </SafeAreaView> 

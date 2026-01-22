@@ -74,3 +74,9 @@ export const items = [
 ];
 
 export type ItemViewType = typeof items[0];
+
+export function getFormattedDate() {
+  const date = new Date();
+  // 'en-CA' produces YYYY-MM-DD; we just strip the dashes
+  return new Intl.DateTimeFormat("en-CA").format(date).replace(/-/g, "");
+}

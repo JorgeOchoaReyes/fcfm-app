@@ -1,3 +1,10 @@
+export interface StatusEvent {
+  id: string; 
+  timestamp: number; 
+  type: "mark-in-progress" | "mark-waiting" | "mark-completed" | "mark-deleted" | "item-added";
+  completedBy: "BOH" | "FOH";
+}
+
 export interface Item {
   id: number;
   name: string;
@@ -13,4 +20,6 @@ export interface Item {
   startedAt?: number;
   deletedAt?: number;
   completedAt?: number;
+
+  history?: StatusEvent[];
 }
