@@ -15,8 +15,8 @@ export default function RootLayout() {
         headerLeft: () => <TouchableOpacity onPress={() => returnFunctiton()}><Ionicons name="arrow-back" size={24} color="white" /></TouchableOpacity>,
         title: "",
         headerStyle: {
-          backgroundColor: "#f31e29"
-        }
+          backgroundColor: "#f31e29",
+        },
       }}
     >
       <Stack.Screen name="index" />

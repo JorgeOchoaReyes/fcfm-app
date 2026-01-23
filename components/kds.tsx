@@ -46,13 +46,15 @@ const KDSItemView = ({
   return (
     <TouchableOpacity
       className={`flex flex-row justify-around gap-4 m-4 p-6 rounded-3xl border border-slate-500 ${completed ? "bg-slate-200 text-black" : assignBgTheme(item)}`}
+      delayPressIn={0} 
       onPress={() => {
         if (completed) {
           onRecall(item.id);
         } else {
           updateStatus(item.code,);
         }
-      }}>
+      }}
+    >
       <View className="col-span-2 font-semibold"><Text className="text-3xl">{item.name}</Text></View>
       <View className="text-center"><Text className="text-3xl">#{item.batchSize}</Text></View>
       {
@@ -98,6 +100,7 @@ export const KDS = ({
     <View className="rounded-2xl bg-slate-50 min-h-120 max-h-120 p-6 shadow-md overflow-auto">
       <TouchableOpacity
         onPress={() => setShowHistory(!showHistory)}
+        delayPressIn={0} 
         className="rounded-md cursor-pointer hover:bg-slate-300 bg-slate-200 text-black flex items-center text-sm p-2 align-end ml-auto mb-6">
         <Text>{showHistory ? "Hide Completed" : "Show Completed"}</Text>
       </TouchableOpacity>
