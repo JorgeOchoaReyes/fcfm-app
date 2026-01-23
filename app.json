@@ -3,9 +3,6 @@
     "name": "fcfm",
     "slug": "fcfm",
     "version": "1.0.0",
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
     "experiments": {
       "tsconfigPaths": true
     },
@@ -39,7 +36,22 @@
         "android.permission.BLUETOOTH_ADVERTISE",
         "android.permission.BLUETOOTH_CONNECT",
         "android.permission.BLUETOOTH_SCAN",
-        "android.permission.NEARBY_WIFI_DEVICES"
+        "android.permission.NEARBY_WIFI_DEVICES",
+        "android.permission.ACCESS_WIFI_STATE",
+        "android.permission.CHANGE_WIFI_STATE",
+        "android.permission.BLUETOOTH",
+        "android.permission.BLUETOOTH_ADMIN",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.BLUETOOTH_ADVERTISE",
+        "android.permission.BLUETOOTH_CONNECT",
+        "android.permission.BLUETOOTH_SCAN",
+        "android.permission.NEARBY_WIFI_DEVICES",
+        "android.permission.ACCESS_WIFI_STATE",
+        "android.permission.CHANGE_WIFI_STATE",
+        "android.permission.BLUETOOTH",
+        "android.permission.BLUETOOTH_ADMIN",
+        "android.permission.ACCESS_COARSE_LOCATION"
       ]
     },
     "extra": {
@@ -48,6 +60,15 @@
         "projectId": "bbf77683-b3b5-4cc3-b592-1c76e38e8f75"
       }
     },
-    "owner": "panda-express"
+    "owner": "panda-express",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/bbf77683-b3b5-4cc3-b592-1c76e38e8f75"
+    },
+    "platforms": [
+      "android"
+    ]
   }
 }
