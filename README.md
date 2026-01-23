@@ -2,7 +2,7 @@
 
 Food with Speed, Accuracy, and Quality. 
 
-## How to run 
+# How to run 
  Requirements: 
 - Android Studio 
 - Physical Device for Peer-to-Peer 
@@ -43,3 +43,15 @@ kotlin.jvm.target.validation.mode = IGNORE
 ```
 npm run android
 ```
+
+# Create APK and OTA Update 
+
+Run: 
+``` npm run apk ```
+
+For OTA Update you must create a new build first, then send the update to the EAS: 
+``` npm run android ```
+
+Then close exit the dev preview and run: 
+
+``` npm run update ```

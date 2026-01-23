@@ -39,7 +39,7 @@ export default function Home() {
         </View> */} 
         <FlatList
           keyExtractor={(item) => item.code}
-          numColumns={4}  
+          numColumns={3}  
           data={items} 
           scrollEnabled
           renderItem={({ item }) => { 
