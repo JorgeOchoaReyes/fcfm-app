@@ -11,7 +11,8 @@
     "web": "expo start --web",
     "clear-cache": "expo start --clear",
     "dev-build": "npx expo run:android",
-    "apk": "eas build --profile production --platform android"
+    "apk": "eas build --profile production --platform android",
+    "update": "eas update --branch production"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -24,6 +25,7 @@
     "expo-nearby-connections": "^1.0.0",
     "expo-router": "~6.0.21",
     "expo-status-bar": "~3.0.9",
+    "expo-updates": "~29.0.16",
     "nativewind": "latest",
     "react": "19.1.0",
     "react-dom": "19.1.0",
