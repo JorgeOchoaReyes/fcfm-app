@@ -2,6 +2,7 @@ import type { ItemViewType } from "../util/constants";
 import { LED } from "./LED";
 import { Timer } from "./Timer";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 export interface ItemControllerProps {
   id?: string;
@@ -11,6 +12,7 @@ export interface ItemControllerProps {
   onClickAdd: (batch: number) => void;
   onClickMarkWaiting: (name: string) => void;
   timestampStarted?: number;
+  status?: "pending" | "in-progress" | "completed" | "waiting" | "deleted" | null;
 }
 
 export function ItemController({
@@ -19,14 +21,23 @@ export function ItemController({
   onClickAdd,
   onClickMarkWaiting,
   timestampStarted,
+  status,
 }: ItemControllerProps) {
   return (
-    <View className={"w-[300px] p-1 mx-auto"}>
+    <View className={"w-[260px] mx-auto my-5"}>
       <View className="bg-white rounded-2xl shadow-lg overflow-hidden">
         <View className="bg-red-500 px-4 py-2 text-center relative">
           <Text className="text-white text-2xl font-bold mb-2">{item.name}</Text>
-          <View className="flex items-center w-16 bg-green-600 w-content px-4 py-1 rounded-full text-sm font-semibold">
-            <Text className="text-white font-bold">{item.code}</Text>
+          <View className="flex flex-row justify-between items-center"> 
+            <View className="flex items-center w-16 bg-green-600 w-content px-4 py-1 rounded-full text-sm font-semibold">
+              <Text className="text-white font-bold">{item.code}</Text>
+            </View>
+            <View className="flex flex-row items-center"> 
+              <Ionicons name="time" size={16} color="white" />
+              <Text className="text-center text-white font-semibold text-sm">
+                {item.cookTime}
+              </Text>
+            </View>
           </View>
         </View>
         <View className="p-2">
@@ -77,13 +88,13 @@ export function ItemController({
               {/* Data row */}
               <View style={styles.row}>
                 <View style={styles.cell}>
-                  <Text style={styles.valueText}>{item.batchServings[1].toFixed(1)}</Text>
+                  <Text style={styles.valueText}>{item.batchServings[1].toFixed(0)}</Text>
                 </View>
                 <View style={styles.cell}>
-                  <Text style={styles.valueText}>{item.batchServings[2].toFixed(1)}</Text>
+                  <Text style={styles.valueText}>{item.batchServings[2].toFixed(0)}</Text>
                 </View>
                 <View style={styles.cell}>
-                  <Text style={styles.valueText}>{item.batchServings[3].toFixed(1)}</Text>
+                  <Text style={styles.valueText}>{item.batchServings[3].toFixed(0)}</Text>
                 </View>
                 <View style={styles.cell}>
                   <Text style={styles.valueText}></Text>
@@ -94,14 +105,16 @@ export function ItemController({
           {
             timestampStarted ? <View className="mt-5 flex flex-row justify-center items-center">
               <Text className="text-gray-900 font-semibold">
-                Cooking: 
-                {/* TODO: Add status based on item status, ie if in progress say in progress, if in queue say queued */} 
+                {
+                  status === "pending" ? "Pending: " : 
+                    status === "in-progress" ? "Cooking: " : 
+                      status === "completed" ? "Completed: " : 
+                        status === "waiting" ? "Waiting: " : 
+                          status === "deleted" ? "Deleted: " : ""
+                }  
               </Text>
               <Timer startTimestamp={timestampStarted} /></View> : null
           }
-          <Text className="text-center text-gray-900 font-semibold mt-6">
-            Cook time: {item.cookTime}
-          </Text>
         </View>
       </View>
     </View>
@@ -118,7 +131,7 @@ const styles = StyleSheet.create({
   },
   cell: {
     flex: 1,
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
     paddingVertical: 4,
   },
   center: {
@@ -143,7 +156,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   headerText: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: "600",
     color: "#111827",
   },

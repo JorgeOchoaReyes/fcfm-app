@@ -21,8 +21,8 @@ export default function Home() {
 
   return (
     <View className={"flex font-sans"}>
-      <View className="flex flex-col h-screen justify-between">
-        <View className="flex flex-col h-screen justify-between"> 
+      <View className="flex flex-col h-screen justify-between w-screen">
+        {/* <View className="flex flex-col h-screen justify-between"> 
           <KDS
             items={listActive()}
             history={listHistory()}
@@ -36,38 +36,37 @@ export default function Home() {
               updateStatus(code,);
             }}
           /> 
-        </View>
-        <View className="flex flex-row pb-10 overflow-auto">  
-          <FlatList
-            keyExtractor={(item) => item.code}
-            numColumns={4}  
-            data={items} 
-            scrollEnabled
-            renderItem={({ item }) => { 
-              const itemInQueue = findItem(item.name);
-              return <ItemController
-                key={item.code}
-                item={item}
-                onClickAdd={(batch: number) => {
-                  add({
-                    id: Date.now(),
-                    name: item.name,
-                    batchSize: batch,
-                    waiting: false,
-                    status: "pending",
-                    createdAt: Date.now(),
-                    code: item.code
-                  });
-                }}
-                waiting={itemInQueue?.waiting ?? false}
-                onClickMarkWaiting={(code: string) => {
-                  markWaiting(code);
-                }}
-                timestampStarted={itemInQueue?.createdAt}
-              />;
-            }}
-          />  
-        </View>
+        </View> */} 
+        <FlatList
+          keyExtractor={(item) => item.code}
+          numColumns={4}  
+          data={items} 
+          scrollEnabled
+          renderItem={({ item }) => { 
+            const itemInQueue = findItem(item.name);
+            return <ItemController
+              key={item.code}
+              item={item}
+              onClickAdd={(batch: number) => {
+                add({
+                  id: Date.now(),
+                  name: item.name,
+                  batchSize: batch,
+                  waiting: false,
+                  status: "pending",
+                  createdAt: Date.now(),
+                  code: item.code
+                });
+              }}
+              waiting={itemInQueue?.waiting ?? false}
+              onClickMarkWaiting={(code: string) => {
+                markWaiting(code);
+              }}
+              timestampStarted={itemInQueue?.createdAt}
+              status={itemInQueue?.status ?? null}
+            />;
+          }}
+        />   
       </View>
     </View>
   );
