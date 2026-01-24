@@ -1,34 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from "react-native";
+import React from "react";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Nearby from "expo-nearby-connections";
 import { useStorageP2P } from "../hooks/useStorage";
+import { useNearbySync } from "../hooks/useNearbySync";
 
 export default function ConnectionPicker() {
-  const [discoveredPeers, setDiscoveredPeers] = useState<{id: string, name: string}[]>([]);
-  const { preferredPeerId, setPreferredPeer } = useStorageP2P();
-
-  useEffect(() => {
-    const foundSub = Nearby.onPeerFound((event) => {
-      setDiscoveredPeers(prev => {
-        if (prev.find(p => p.id === event.peerId)) return prev;
-        return [...prev, { id: event.peerId, name: event.name }];
-      });
- 
-      if (event.peerId === preferredPeerId) {
-        Nearby.acceptConnection(event.peerId);
-      }
-    });
-
-    const lostSub = Nearby.onPeerLost((event) => {
-      setDiscoveredPeers(prev => prev.filter(p => p.id !== event.peerId));
-    });
-
-    return () => {
-      foundSub();
-      lostSub();
-    };
-  }, [preferredPeerId]);
+  const { preferredPeerId, setPreferredPeer, deviceId, setDeviceId } = useStorageP2P();
+  const { discoveredPeers, isSearching, startP2P, } = useNearbySync();
 
   const togglePermanent = (id: string) => {
     if (preferredPeerId === id) {
@@ -42,34 +21,48 @@ export default function ConnectionPicker() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Nearby Devices</Text>
-        <TouchableOpacity onPress={() => setDiscoveredPeers([])}>
+        <Text style={styles.title}>Searching for Devices</Text>
+        <TouchableOpacity onPress={startP2P}>
           <Ionicons name="refresh" size={20} color="#666" />
         </TouchableOpacity>
       </View>
 
+      <Text>Device ID: {deviceId}</Text>
+      <Text>Preferred Peer ID: {preferredPeerId}</Text>
+
+      <View>
+        <TextInput
+          placeholder="Device ID to broadcast"
+          value={deviceId}
+          onChangeText={setDeviceId}
+        />
+      </View>
+      <TouchableOpacity onPress={() => setDeviceId(deviceId)}>
+        <Text>Set Device ID</Text>
+      </TouchableOpacity>
+
       <FlatList
         data={discoveredPeers}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.peerId}
         renderItem={({ item }) => (
           <View style={styles.peerItem}>
             <View style={styles.peerInfo}> 
               <Ionicons name="bluetooth" size={20} color="#1890ff" />
               <Text style={styles.peerName}>{item.name}</Text>
-              {preferredPeerId === item.id && <Text style={styles.trustedLabel}>(Trusted)</Text>}
+              {preferredPeerId === item.peerId && <Text style={styles.trustedLabel}>(Trusted)</Text>}
             </View>
             
             <View style={styles.actions}>
               <TouchableOpacity 
                 style={styles.iconBtn} 
-                onPress={() => togglePermanent(item.id)}
+                onPress={() => togglePermanent(item.peerId)}
               >
-                <Ionicons name="star" size={24} color={preferredPeerId === item.id ? "#fadb14" : "#d9d9d9"} />
+                <Ionicons name="star" size={24} color={preferredPeerId === item.peerId ? "#fadb14" : "#d9d9d9"} />
               </TouchableOpacity>
 
               <TouchableOpacity 
                 style={styles.connectBtn} 
-                onPress={() => Nearby.acceptConnection(item.id)}
+                onPress={() => Nearby.acceptConnection(item.peerId)}
               >
                 <Ionicons name="link" size={18} color="#fff" />
                 <Text style={styles.btnText}>Connect</Text>
@@ -77,7 +70,7 @@ export default function ConnectionPicker() {
             </View>
           </View>
         )}
-        ListEmptyComponent={<Text style={styles.empty}>Scanning for devices...</Text>}
+        ListEmptyComponent={<Text style={styles.empty}>{isSearching ? "Scanning for devices..." : "No devices found."}</Text>}
       />
     </View>
   );

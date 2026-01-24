@@ -14,7 +14,7 @@ const requestLocationNeabyDevicesPermission = async () => {
         PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT, 
         PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
         PermissionsAndroid.PERMISSIONS.CAMERA,
-        PermissionsAndroid.PERMISSIONS.BLUETOOTH_ADVERTISE,
+        PermissionsAndroid.PERMISSIONS.BLUETOOTH_ADVERTISE,  
       ],
     );  
     const grantedAll = Object.values(granted).every((item) => item === "granted"); 

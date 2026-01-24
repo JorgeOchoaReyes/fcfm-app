@@ -8,6 +8,8 @@ interface DBStorage {
   lastUpdated: number;
   preferredPeerId: string | null;
   dateOfStorage: string; 
+  deviceId: string;
+  setDeviceId: (id: string) => void;
   setPreferredPeer: (id: string | null) => void;
   syncWithPeer: (incomingData: string) => void;
   updatePriorityQueueStorage: (incomingData: string) => void;
@@ -20,6 +22,8 @@ export const useStorageP2P  = create<DBStorage>()(
       lastUpdated: 0, 
       preferredPeerId: null,
       dateOfStorage: getFormattedDate(), 
+      deviceId: "",
+      setDeviceId: (id: string) => set({ deviceId: id }),
       setPreferredPeer: (id: string | null) => set({ preferredPeerId: id }),
       syncWithPeer: (incomingData: string) => {
         const localTime = get().lastUpdated;
@@ -35,7 +39,15 @@ export const useStorageP2P  = create<DBStorage>()(
           priorityQueueStorage: incomingData
         });
         return true;
-      }
+      },
+      clearStorage: () => {
+        set({
+          priorityQueueStorage: "",
+          lastUpdated: 0,
+          preferredPeerId: null,
+          dateOfStorage: getFormattedDate(),
+        });
+      },
     }),
     {
       name: "fcfm-storage",

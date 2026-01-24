@@ -2,10 +2,11 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import * as Nearby from "expo-nearby-connections";
 import { useStorageP2P } from "../hooks/useStorage";
 
-export const useNearbySync = (userName: string) => {
+export const useNearbySync = () => {
   const [connectedPeer, setConnectedPeer] = useState<string | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const { preferredPeerId, syncWithPeer } = useStorageP2P();
+  const [discoveredPeers, setDiscoveredPeers] = useState<Nearby.BasePeer[]>([]);
   
   const isConnected = useRef(false);
 
@@ -19,12 +20,12 @@ export const useNearbySync = (userName: string) => {
       await Nearby.stopAdvertise();
 
       // We use P2P_CLUSTER to allow any device to be both seeker and hub
-      await Nearby.startAdvertise(userName, Nearby.Strategy.P2P_CLUSTER);
-      await Nearby.startDiscovery(userName, Nearby.Strategy.P2P_CLUSTER);
+      await Nearby.startAdvertise("fcfm_panda", Nearby.Strategy.P2P_CLUSTER);
+      await Nearby.startDiscovery("fcfm_panda", Nearby.Strategy.P2P_CLUSTER);
     } catch (e) {
       console.error("P2P Init Error:", e);
     }
-  }, [userName]);
+  }, []);
 
   useEffect(() => {
     // A. AUTO-ACCEPT HANDSHAKE
@@ -45,6 +46,12 @@ export const useNearbySync = (userName: string) => {
       if (!preferredPeerId || event.peerId === preferredPeerId) {
         Nearby.acceptConnection(event.peerId);
       }
+      setDiscoveredPeers(prev => [...prev, event]);
+      setIsSearching(false);
+    });
+
+    const lostSub = Nearby.onPeerLost((event) => {
+      setDiscoveredPeers(prev => prev.filter(p => p.peerId !== event.peerId));
     });
 
     // C. Connection Success
@@ -72,12 +79,13 @@ export const useNearbySync = (userName: string) => {
 
     startP2P();
 
-    return () => {
-    //   inviteSub.remove();
-    //   foundSub.remove();
-    //   connectSub.remove();
-    //   disconnectSub.remove();
-    //   payloadSub.remove(); 
+    return () => { 
+      lostSub();
+      foundSub();
+      connectSub();
+      disconnectSub();
+      inviteSub();
+      payloadSub();
       Nearby.stopDiscovery();
       Nearby.stopAdvertise();
     };
@@ -97,5 +105,5 @@ export const useNearbySync = (userName: string) => {
     Nearby.sendText(targetId, dataToSend);
   };
 
-  return { connectedPeer, isSearching, syncData };
+  return { connectedPeer, isSearching, discoveredPeers, startP2P, syncData };
 };
