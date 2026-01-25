@@ -1,24 +1,22 @@
 import { usePriorityQueue } from "../hooks/usePriority-Queue"; 
-import { View } from "react-native";
+import { Text, View } from "react-native";
 import { KDS } from "../components/KDS"; 
+import { useStorageP2P } from "../hooks/useStorage";
 
 export default function Home() {
 
   const {
-    add,
     listActive,
-    listAll,
     listHistory,
-    remove,
-    markWaiting,
-    findItem,
+    remove, 
     updateStatus,
     recall,
-    pq
   } = usePriorityQueue(); 
 
+  const { dateOfStorage } = useStorageP2P();
+
   return (
-    <View className={"flex font-sans"}>
+    <View className={"flex font-sans bg-white h-screen"}>
       <View className="flex flex-col h-screen justify-between"> 
         <KDS
           items={listActive()}

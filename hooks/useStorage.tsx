@@ -8,9 +8,17 @@ interface DBStorage {
   lastUpdated: number;
   preferredPeerId: string | null;
   dateOfStorage: string; 
+  deviceId: string;
+  connectedPeer: string | null;
+  isSearching: boolean;
+  setDeviceId: (id: string) => void;
+  setConnectedPeer: (id: string | null) => void;
+  setIsSearching: (searching: boolean) => void;
   setPreferredPeer: (id: string | null) => void;
   syncWithPeer: (incomingData: string) => void;
   updatePriorityQueueStorage: (incomingData: string) => void;
+  clearStorage: () => void;
+  clearStorageDaily: () => void;
 }
 
 export const useStorageP2P  = create<DBStorage>()(
@@ -20,6 +28,13 @@ export const useStorageP2P  = create<DBStorage>()(
       lastUpdated: 0, 
       preferredPeerId: null,
       dateOfStorage: getFormattedDate(), 
+      deviceId: "",
+      connectedPeer: null,
+      isSearching: false,
+
+      setDeviceId: (id: string) => set({ deviceId: id }),
+      setConnectedPeer: (id: string | null) => set({ connectedPeer: id }),
+      setIsSearching: (searching: boolean) => set({ isSearching: searching }),
       setPreferredPeer: (id: string | null) => set({ preferredPeerId: id }),
       syncWithPeer: (incomingData: string) => {
         const localTime = get().lastUpdated;
@@ -35,7 +50,25 @@ export const useStorageP2P  = create<DBStorage>()(
           priorityQueueStorage: incomingData
         });
         return true;
-      }
+      },
+      clearStorage: () => {
+        set({
+          priorityQueueStorage: "",
+          lastUpdated: 0,
+          preferredPeerId: null,
+          dateOfStorage: getFormattedDate(),
+        });
+      },
+      clearStorageDaily: () => {
+        const currentDate = getFormattedDate();
+        const storedDate = get().dateOfStorage;
+        if (storedDate !== currentDate) {
+          get().clearStorage();
+        }
+        set({
+          dateOfStorage: currentDate
+        });
+      },
     }),
     {
       name: "fcfm-storage",

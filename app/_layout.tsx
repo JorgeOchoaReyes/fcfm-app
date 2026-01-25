@@ -1,7 +1,9 @@
-import { Stack , useRouter } from "expo-router";  
-import { TouchableOpacity, PermissionsAndroid } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { useEffect } from "react";
+import { Stack, useRouter, usePathname } from "expo-router";
+import { TouchableOpacity, PermissionsAndroid, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import NearbyStatusBadge from "../components/NearbyStatusBadge";
+import { useStorageP2P } from "../hooks/useStorage";
 
 const requestLocationNeabyDevicesPermission = async () => {
   try {
@@ -14,7 +16,7 @@ const requestLocationNeabyDevicesPermission = async () => {
         PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT, 
         PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
         PermissionsAndroid.PERMISSIONS.CAMERA,
-        PermissionsAndroid.PERMISSIONS.BLUETOOTH_ADVERTISE,
+        PermissionsAndroid.PERMISSIONS.BLUETOOTH_ADVERTISE,  
       ],
     );  
     const grantedAll = Object.values(granted).every((item) => item === "granted"); 
@@ -30,22 +32,39 @@ const requestLocationNeabyDevicesPermission = async () => {
 
 export default function RootLayout() {
   const router = useRouter();
+  const pathname = usePathname();
+  const { clearStorageDaily } = useStorageP2P();
   const returnFunctiton = () => {
     router.navigate("/");
   };
 
   useEffect(() => {
-    requestLocationNeabyDevicesPermission();
+    requestLocationNeabyDevicesPermission(); 
   }, []);
 
+  useEffect(() => { 
+    setInterval(() => {
+      clearStorageDaily();
+    }, 60 * 1000);
+  }, [clearStorageDaily]);
+
   return <>
+    <NearbyStatusBadge />
+    {
+      pathname !== "/" &&
+      <View style={  {
+        position: "absolute",
+        top: 20, 
+        left: 16,
+        zIndex: 9999, 
+        elevation: 5,
+      }}> 
+        <TouchableOpacity onPress={() => returnFunctiton()}><Ionicons name="arrow-back" size={24} color="black" /></TouchableOpacity>
+      </View>
+    }
     <Stack
-      screenOptions={{ 
-        headerLeft: () => <TouchableOpacity onPress={() => returnFunctiton()}><Ionicons name="arrow-back" size={24} color="white" /></TouchableOpacity>,
-        title: "",
-        headerStyle: {
-          backgroundColor: "#f31e29",
-        },
+      screenOptions={{  
+        headerShown: false,
       }}
     >
       <Stack.Screen name="index" />
