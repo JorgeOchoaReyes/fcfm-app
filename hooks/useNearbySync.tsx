@@ -3,12 +3,21 @@ import * as Nearby from "expo-nearby-connections";
 import { useStorageP2P } from "../hooks/useStorage";
 
 export const useNearbySync = () => {
-  const [connectedPeer, setConnectedPeer] = useState<string | null>(null);
-  const [isSearching, setIsSearching] = useState(false);
-  const { preferredPeerId, syncWithPeer } = useStorageP2P();
+  const { 
+    preferredPeerId, 
+    syncWithPeer, 
+    connectedPeer, 
+    setConnectedPeer, 
+    isSearching, 
+    setIsSearching 
+  } = useStorageP2P();
   const [discoveredPeers, setDiscoveredPeers] = useState<Nearby.BasePeer[]>([]);
   
   const isConnected = useRef(false);
+
+  useEffect(() => {
+    isConnected.current = !!connectedPeer;
+  }, [connectedPeer]);
 
   // 1. Service Management: Stops and restarts all radios
   const startP2P = useCallback(async () => {
@@ -25,7 +34,7 @@ export const useNearbySync = () => {
     } catch (e) {
       console.error("P2P Init Error:", e);
     }
-  }, []);
+  }, [setIsSearching]);
 
   useEffect(() => {
     // A. AUTO-ACCEPT HANDSHAKE
@@ -51,6 +60,7 @@ export const useNearbySync = () => {
     });
 
     const lostSub = Nearby.onPeerLost((event) => {
+      console.log(`Peer lost: ${event.peerId}`);
       setDiscoveredPeers(prev => prev.filter(p => p.peerId !== event.peerId));
     });
 
@@ -89,7 +99,7 @@ export const useNearbySync = () => {
       Nearby.stopDiscovery();
       Nearby.stopAdvertise();
     };
-  }, [startP2P, preferredPeerId]);
+  }, [startP2P, preferredPeerId, setConnectedPeer, setIsSearching, syncWithPeer]);
 
   const syncData = (targetId: string) => {
     const state = {
