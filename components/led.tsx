@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -33,7 +33,7 @@ const colorMap = {
 
 export const LED: React.FC<LEDProps> = ({
   state = "off",
-  color = "red",
+  color = "yellow",
   size = "md",
   label,
   onClick,
@@ -46,41 +46,41 @@ export const LED: React.FC<LEDProps> = ({
   const opacity = useRef(new Animated.Value(1)).current;
   const scale = useRef(new Animated.Value(1)).current;
 
-  //   useEffect(() => {
-  //     if (isOn && pulse) {
-  //       Animated.loop(
-  //         Animated.sequence([
-  //           Animated.parallel([
-  //             Animated.timing(opacity, {
-  //               toValue: 0.7,
-  //               duration: 1000,
-  //               useNativeDriver: true,
-  //             }),
-  //             Animated.timing(scale, {
-  //               toValue: 0.9,
-  //               duration: 1000,
-  //               useNativeDriver: true,
-  //             }),
-  //           ]),
-  //           Animated.parallel([
-  //             Animated.timing(opacity, {
-  //               toValue: 1,
-  //               duration: 1000,
-  //               useNativeDriver: true,
-  //             }),
-  //             Animated.timing(scale, {
-  //               toValue: 1,
-  //               duration: 1000,
-  //               useNativeDriver: true,
-  //             }),
-  //           ]),
-  //         ])
-  //       ).start();
-  //     } else {
-  //       opacity.setValue(1);
-  //       scale.setValue(1);
-  //     }
-  //   }, [isOn, pulse]);
+  useEffect(() => {
+    if (isOn && pulse) {
+      Animated.loop(
+        Animated.sequence([
+          Animated.parallel([
+            Animated.timing(opacity, {
+              toValue: .4,
+              duration: 1000,
+              useNativeDriver: true,
+            }),
+            Animated.timing(scale, {
+              toValue: 0.98,
+              duration: 1000,
+              useNativeDriver: true,
+            }),
+          ]),
+          Animated.parallel([
+            Animated.timing(opacity, {
+              toValue: 1,
+              duration: 500,
+              useNativeDriver: true,
+            }),
+            Animated.timing(scale, {
+              toValue: 1,
+              duration: 500,
+              useNativeDriver: true,
+            }),
+          ]),
+        ])
+      ).start();
+    } else {
+      opacity.setValue(1);
+      scale.setValue(1);
+    }
+  }, [isOn, pulse]);
 
   const Wrapper = onClick ? TouchableOpacity : View;
 

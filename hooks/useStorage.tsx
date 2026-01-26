@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getFormattedDate } from "util/constants";
+import { getFormattedDate } from "util/constants"; 
 
 interface DBStorage {
   priorityQueueStorage: string;
@@ -57,11 +57,15 @@ export const useStorageP2P  = create<DBStorage>()(
           lastUpdated: 0,
           preferredPeerId: null,
           dateOfStorage: getFormattedDate(),
-        });
+        });  
       },
       clearStorageDaily: () => {
         const currentDate = getFormattedDate();
         const storedDate = get().dateOfStorage;
+        console.log(
+          "current_date", currentDate, 
+          "stored_date", storedDate
+        );
         if (storedDate !== currentDate) {
           get().clearStorage();
         }
@@ -71,7 +75,7 @@ export const useStorageP2P  = create<DBStorage>()(
       },
     }),
     {
-      name: "fcfm-storage",
+      name: "fcfm-settings-storage",
       storage: createJSONStorage(() => AsyncStorage),
     }
   ),

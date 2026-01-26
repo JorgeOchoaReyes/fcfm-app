@@ -4,6 +4,8 @@ import { TouchableOpacity, PermissionsAndroid, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import NearbyStatusBadge from "../components/NearbyStatusBadge";
 import { useStorageP2P } from "../hooks/useStorage";
+import * as Nearby from "expo-nearby-connections";
+import { usePriorityQueue } from "../hooks/usePriority-Queue";
 
 const requestLocationNeabyDevicesPermission = async () => {
   try {
@@ -33,7 +35,8 @@ const requestLocationNeabyDevicesPermission = async () => {
 export default function RootLayout() {
   const router = useRouter();
   const pathname = usePathname();
-  const { clearStorageDaily } = useStorageP2P();
+  const { clearStorageDaily, preferredPeerId,  } = useStorageP2P();
+  const { clearPriorityQueue } = usePriorityQueue(); 
   const returnFunctiton = () => {
     router.navigate("/");
   };
@@ -44,9 +47,36 @@ export default function RootLayout() {
 
   useEffect(() => { 
     setInterval(() => {
-      clearStorageDaily();
+      // clearStorageDaily();
+      // clearPriorityQueue();
     }, 60 * 1000);
-  }, [clearStorageDaily]);
+  }, [clearStorageDaily, clearPriorityQueue]);
+
+  useEffect(() => {
+    const inviteSub = Nearby.onInvitationReceived((event) => {
+      console.log(`Handshake initiated with ${event.peerId}`); 
+      if (!preferredPeerId || event.peerId === preferredPeerId) {
+        Nearby.acceptConnection(event.peerId);
+      } 
+    }); 
+  
+    const disconnectSub = Nearby.onDisconnected(() => {
+       
+    });
+  
+    const payloadSub = Nearby.onTextReceived((event) => {
+      const incomingData = JSON.parse(event.text); 
+    });
+   
+    return () => {  
+      disconnectSub();
+      inviteSub();
+      payloadSub();
+      Nearby.stopDiscovery();
+      Nearby.stopAdvertise();
+    };
+  }, [preferredPeerId,]);
+  
 
   return <>
     <NearbyStatusBadge />

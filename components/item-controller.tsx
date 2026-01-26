@@ -27,26 +27,25 @@ export function ItemController({
     <View className={"w-[260px] mx-auto my-5"}>
       <View className="bg-white rounded-2xl shadow-lg overflow-hidden">
         <View className="bg-red-500 px-4 py-2 text-center relative">
-          <Text className="text-white text-2xl font-bold mb-2">{item.name}</Text>
           <View className="flex flex-row justify-between items-center"> 
+            <Text className="text-white text-lg font-bold mb-2">{item.name}</Text>
             <View className="flex items-center w-16 bg-green-600 w-content px-4 py-1 rounded-full text-sm font-semibold">
               <Text className="text-white font-bold">{item.code}</Text>
             </View>
-            <View className="flex flex-row items-center"> 
-              <Ionicons name="time" size={16} color="white" />
-              <Text className="text-center text-white font-semibold text-sm">
-                {item.cookTime}
-              </Text>
-            </View>
+          </View> 
+          <View className="flex flex-row items-center"> 
+            <Ionicons name="time" size={16} color="white" />
+            <Text className="text-center text-white font-semibold text-sm">
+              {item.cookTime}
+            </Text>
           </View>
         </View>
         <View className="p-2">
           <View className=" rounded-lg overflow-hidden">
-            <View style={styles.table}>
-              {/* Header row */}
+            <View style={styles.table}> 
               <View style={styles.row}>
                 {[1, 2, 3].map((n) => (
-                  <View key={n} style={styles.cell}>
+                  <View key={n} style={styles.cell}>  
                     <TouchableOpacity
                       style={styles.redButton}
                       onPress={() => onClickAdd(n)}
@@ -56,7 +55,6 @@ export function ItemController({
                     </TouchableOpacity>
                   </View>
                 ))}
-
                 <View style={[styles.cell, styles.center]}>
                   <LED state={waiting ? "on" : "off"} pulse={waiting} />
                   <TouchableOpacity
@@ -70,7 +68,7 @@ export function ItemController({
               </View>
 
               {/* Label row */}
-              <View style={styles.row}>
+              {/* <View style={styles.row}>
                 <View style={styles.cell}>
                   <Text style={styles.headerText}>#1</Text>
                 </View>
@@ -83,10 +81,10 @@ export function ItemController({
                 <View style={styles.cell}>
                   <Text style={styles.headerText}></Text>
                 </View>
-              </View>
+              </View> */}
 
               {/* Data row */}
-              <View style={styles.row}>
+              {/* <View style={styles.row}>
                 <View style={styles.cell}>
                   <Text style={styles.valueText}>{item.batchServings[1].toFixed(0)}</Text>
                 </View>
@@ -99,11 +97,11 @@ export function ItemController({
                 <View style={styles.cell}>
                   <Text style={styles.valueText}></Text>
                 </View>
-              </View>
+              </View> */}
             </View>
           </View>
           {
-            timestampStarted ? <View className="mt-5 flex flex-row justify-center items-center">
+            timestampStarted ? <View className="mt-1 flex flex-row justify-center items-center">
               <Text className="text-gray-900 font-semibold">
                 {
                   status === "pending" ? "Pending: " : 
@@ -147,7 +145,7 @@ const styles = StyleSheet.create({
   warningButton: {
     backgroundColor: "#f59e0b",
     paddingVertical: 6,
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     borderRadius: 16,
     alignItems: "center",
   },

@@ -1,8 +1,7 @@
 import { ItemController } from "../components/Item-Controller"; 
 import { items } from "../util/constants"; 
 import { usePriorityQueue } from "../hooks/usePriority-Queue"; 
-import { View, FlatList } from "react-native";
-import { KDS } from "../components/KDS";
+import { View, FlatList, Text } from "react-native"; 
 
 export default function Home() {
 
@@ -20,26 +19,11 @@ export default function Home() {
   } = usePriorityQueue(); 
 
   return (
-    <View className={"flex font-sans"}>
-      <View className="flex flex-col h-screen justify-between w-screen">
-        {/* <View className="flex flex-col h-screen justify-between"> 
-          <KDS
-            items={listActive()}
-            history={listHistory()}
-            onRecall={(id: number) => {
-              recall(id);
-            }}
-            onDelete={(code: string) => {
-              remove(code);
-            }}
-            onUpdateStatus={(code: string, status?: "pending" | "in-progress" | "completed") => {
-              updateStatus(code,);
-            }}
-          /> 
-        </View> */} 
+    <View className={"flex font-sans flex-row"}>
+      <View className="h-screen justify-start w-screen flex flex-row flex-1"> 
         <FlatList
           keyExtractor={(item) => item.code}
-          numColumns={3}  
+          numColumns={2}  
           data={items} 
           scrollEnabled
           renderItem={({ item }) => { 
@@ -67,6 +51,9 @@ export default function Home() {
             />;
           }}
         />   
+      </View>
+      <View className="h-16 flex-1">
+        <Text>New Table</Text>
       </View>
     </View>
   );
