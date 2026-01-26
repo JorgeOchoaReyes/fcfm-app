@@ -32,6 +32,9 @@ export default function Home() {
           }}
         /> 
       </View>
+      <View className="h-16 flex-1">
+        <Text>New Table</Text>
+      </View>
     </View>
   );
 }
