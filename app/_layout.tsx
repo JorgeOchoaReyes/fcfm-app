@@ -35,7 +35,7 @@ const requestLocationNeabyDevicesPermission = async () => {
 export default function RootLayout() {
   const router = useRouter();
   const pathname = usePathname();
-  const { clearStorageDaily, preferredPeerId,  } = useStorageP2P();
+  const { clearStorageDaily, preferredPeerId, setConnectedPeer, setIsConnected, setDeviceName } = useStorageP2P();
   const { clearPriorityQueue } = usePriorityQueue(); 
   const returnFunctiton = () => {
     router.navigate("/");
@@ -53,20 +53,28 @@ export default function RootLayout() {
   }, [clearStorageDaily, clearPriorityQueue]);
 
   useEffect(() => {
-    const inviteSub = Nearby.onInvitationReceived( async (event) => {
-      console.log(`Handshake initiated with ${event.peerId}`); 
+    const inviteSub = Nearby.onInvitationReceived( async (event) => { 
       alert(`Handshake initiated with ${event.peerId} - ${event.name}`);
       if (!preferredPeerId || event.peerId === preferredPeerId) {
         await Nearby.acceptConnection(event.peerId);
+        setIsConnected(true);
+        setConnectedPeer(event.peerId);
+        setDeviceName(event.name);
       } else {
         if(event.name === "BOH" || event.name === "FOH") {
           await Nearby.acceptConnection(event.peerId);
+          setIsConnected(true);
+          setConnectedPeer(event.peerId);
+          setDeviceName(event.name);
         }
       }
     }); 
   
-    const disconnectSub = Nearby.onDisconnected(() => {
-       
+    const disconnectSub = Nearby.onDisconnected(() => { 
+      setIsConnected(false);
+      setConnectedPeer(null);
+      setDeviceName("");
+      alert("Disconnected");
     });
   
     const payloadSub = Nearby.onTextReceived((event) => {
@@ -94,7 +102,7 @@ export default function RootLayout() {
         zIndex: 9999, 
         elevation: 5,
       }}> 
-        <TouchableOpacity onPress={() => returnFunctiton()}><Ionicons name="arrow-back" size={24} color="black" /></TouchableOpacity>
+        <TouchableOpacity onPress={() => returnFunctiton()}><Ionicons name="arrow-back" size={32} color="black" /></TouchableOpacity>
       </View>
     }
     <Stack

@@ -12,6 +12,8 @@ interface DBStorage {
   connectedPeer: string | null;
   isSearching: boolean;
   isConnected: boolean;
+  deviceName: string;
+  setDeviceName: (name: string) => void;
   setIsConnected: (connected: boolean) => void;
   setDeviceId: (id: string) => void;
   setConnectedPeer: (id: string | null) => void;
@@ -34,6 +36,8 @@ export const useStorageP2P  = create<DBStorage>()(
       connectedPeer: null,
       isSearching: false,
       isConnected: false,
+      deviceName: "",
+      setDeviceName: (name: string) => set({ deviceName: name }),
 
       setIsConnected: (connected: boolean) => set({ isConnected: connected }),
       setDeviceId: (id: string) => set({ deviceId: id }),

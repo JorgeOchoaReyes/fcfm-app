@@ -13,7 +13,7 @@ export function BOHItem({
   onClickAdd, 
 }: ItemControllerProps) {
   return (
-    <View className={"w-[200px] mx-auto my-5"}>
+    <View className={"w-[200px] mx-auto my-1"}>
       <View className="bg-red-500  rounded-2xl shadow-lg overflow-hidden">
         <View className="px-4 flex items-center py-2 text-center relative">
           <View className="flex flex-row justify-between items-center"> 
