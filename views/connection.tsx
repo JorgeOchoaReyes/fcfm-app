@@ -7,18 +7,18 @@ import { useNearbySync } from "../hooks/useNearbySync";
 import { usePriorityQueue } from "hooks/usePriority-Queue";
 
 export default function ConnectionPicker() {
-  const { preferredPeerId, setPreferredPeer, deviceId, setDeviceId, connectedPeer } = useStorageP2P();
-  const { discoveredPeers, isSearching, startP2P } = useNearbySync();
+  const { preferredPeerId, setPreferredPeer, deviceId, setDeviceId, deviceName, connectedPeer, clearStorage } = useStorageP2P();
+  const { discoveredPeers, isSearching, startP2P, stopP2P, disconnect } = useNearbySync();
   const { clearPriorityQueue } = usePriorityQueue();
   const [isEditingId, setIsEditingId] = useState(false);
   const [tempDeviceId, setTempDeviceId] = useState(deviceId);
 
-  const togglePermanent = (id: string) => {
+  const togglePermanent = async (id: string) => {
     if (preferredPeerId === id) {
       setPreferredPeer(null);
     } else {
       setPreferredPeer(id);
-      Nearby.acceptConnection(id);
+      await Nearby.acceptConnection(id);
     }
   };
 
@@ -60,14 +60,23 @@ export default function ConnectionPicker() {
 
         <View style={styles.cardActions}>
           {isCurrentConnected ? (
-            <View style={styles.statusBadge}>
-              <Ionicons name="checkmark-circle" size={16} color="#fff" />
-              <Text style={styles.statusBadgeText}>Connected</Text>
+            <View style={styles.statusBadgeContainer}>
+              <View style={styles.statusBadge}>
+                <Ionicons name="checkmark-circle" size={16} color="#fff" />
+                <Text style={styles.statusBadgeText}>Connected</Text>
+              </View>
+              <TouchableOpacity 
+                style={styles.disconnectButton} 
+                onPress={() => disconnect(item.peerId)}
+              >
+                <Ionicons name="close-circle-outline" size={20} color="#fff" />
+                <Text style={styles.disconnectButtonText}>Disconnect</Text>
+              </TouchableOpacity>
             </View>
           ) : (
             <TouchableOpacity 
               style={styles.connectButton} 
-              onPress={() => Nearby.requestConnection(item.peerId)}
+              onPress={async () => await Nearby.requestConnection(item.peerId)}
             >
               <Text style={styles.connectButtonText}>Connect Now</Text>
               <Ionicons name="arrow-forward" size={16} color="#fff" />
@@ -105,13 +114,24 @@ export default function ConnectionPicker() {
           backgroundColor: "red",
           padding: 10,
           borderRadius: 10, 
+          marginRight: 10,
+          alignItems: "center",
+        }} onPress={() => {
+          clearStorage();
+        }}>
+          <Text style={{...styles.sectionTitle, color: "white"}}>Clear General Storage</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={{
+          backgroundColor: "red",
+          padding: 10,
+          borderRadius: 10, 
           alignItems: "center",
         }} onPress={() => {
           clearPriorityQueue();
         }}>
           <Text style={{...styles.sectionTitle, color: "white"}}>Clear PQ Storage</Text>
         </TouchableOpacity>
-      </View>
+      </View> 
 
       <View style={styles.myDeviceSection}>
         <View style={styles.sectionHeader}>
@@ -141,7 +161,14 @@ export default function ConnectionPicker() {
               <Text style={styles.idLabel}>Broadcasting as</Text>
               <Text style={styles.idValue}>{deviceId || "Unknown Device"}</Text>
             </View>
-            <View style={[styles.pulse, isSearching && styles.pulseActive]} />
+            <View style={styles.idActions}>
+              <View style={[styles.pulse, isSearching && styles.pulseActive]} />
+              {isSearching && (
+                <TouchableOpacity style={styles.stopButton} onPress={stopP2P}>
+                  <Ionicons name="stop-circle-outline" size={24} color="#ff4d4f" />
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
         )}
       </View>
@@ -155,7 +182,13 @@ export default function ConnectionPicker() {
         </View>
 
         <FlatList
-          data={discoveredPeers}
+          data={[
+            {
+              peerId: connectedPeer || "",
+              name: deviceName || ""
+            },
+            ...discoveredPeers
+          ].filter(p => p.peerId !== "")}
           keyExtractor={(item) => item.peerId}
           renderItem={renderPeerItem}
           contentContainerStyle={styles.listContent}
@@ -375,6 +408,33 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 12,
     marginLeft: 4,
+  },
+  statusBadgeContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  disconnectButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    marginLeft: 10,
+  },
+  disconnectButtonText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 12,
+    marginLeft: 4,
+  },
+  idActions: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  stopButton: {
+    padding: 4,
+    marginLeft: 12,
   },
   emptyState: {
     alignItems: "center",
