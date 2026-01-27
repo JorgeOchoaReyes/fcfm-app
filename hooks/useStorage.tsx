@@ -11,6 +11,8 @@ interface DBStorage {
   deviceId: string;
   connectedPeer: string | null;
   isSearching: boolean;
+  isConnected: boolean;
+  setIsConnected: (connected: boolean) => void;
   setDeviceId: (id: string) => void;
   setConnectedPeer: (id: string | null) => void;
   setIsSearching: (searching: boolean) => void;
@@ -31,7 +33,9 @@ export const useStorageP2P  = create<DBStorage>()(
       deviceId: "",
       connectedPeer: null,
       isSearching: false,
+      isConnected: false,
 
+      setIsConnected: (connected: boolean) => set({ isConnected: connected }),
       setDeviceId: (id: string) => set({ deviceId: id }),
       setConnectedPeer: (id: string | null) => set({ connectedPeer: id }),
       setIsSearching: (searching: boolean) => set({ isSearching: searching }),
@@ -62,10 +66,6 @@ export const useStorageP2P  = create<DBStorage>()(
       clearStorageDaily: () => {
         const currentDate = getFormattedDate();
         const storedDate = get().dateOfStorage;
-        console.log(
-          "current_date", currentDate, 
-          "stored_date", storedDate
-        );
         if (storedDate !== currentDate) {
           get().clearStorage();
         }

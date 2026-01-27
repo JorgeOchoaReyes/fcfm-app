@@ -75,16 +75,9 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
         return [...pq.inProgressItems, ...pq.waitingItems, ...pq.pendingItems, ...pq.history].sort((a, b) => b.createdAt - a.createdAt);
       },
       remove: (code: string) => {
-        const { pq } = get();
-        if (!pq.instanceTracker[code]) {
-          alert("Item not in queue.");
-          return;
-        }
-
         set((state) => {
           const newPq = { ...state.pq };
-          let removedItem: Item | undefined;
-
+          let removedItem: Item | undefined; 
           if (newPq.pendingItems.some(i => i.code === code)) {
             removedItem = newPq.pendingItems.find(i => i.code === code);
             newPq.pendingItems = newPq.pendingItems.filter(i => i.code !== code);
@@ -98,15 +91,13 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
 
           if (removedItem) {
             const historyItem = { ...removedItem, status: "deleted" as const };
-            const { [code]: _, ...remainingInstances } = newPq.instanceTracker;
-            const { [code]: __, ...remainingWaiting } = newPq.waitingTracker;
+            delete newPq.instanceTracker[code];
+            delete newPq.waitingTracker[code];
             
             return {
               pq: {
                 ...newPq,
                 history: [...newPq.history, historyItem],
-                instanceTracker: remainingInstances,
-                waitingTracker: remainingWaiting
               }
             };
           }
@@ -128,8 +119,9 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
         }
 
         set((state) => {
-          const updatedTarget = { ...target, status: target.status === "completed" ? ("pending" as const) : target.status };
-          delete updatedTarget.completedAt;
+          const newStatus = target.status === "completed"? "pending" : target.status === "deleted"? "pending" : "in-progress" as Item["status"];
+          const updatedTarget = { ...target, status: newStatus };
+          updatedTarget.completedAt = undefined; 
           
           const category = getCategory(updatedTarget);
           return {

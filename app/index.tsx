@@ -27,7 +27,7 @@ export default function App() {
           style={styles.bigButtonSettings}>
           <Text style={styles.buttonText}>Settings</Text>
         </TouchableOpacity>
-      </SafeAreaView> 
+      </SafeAreaView>  
     </>
   );
 }

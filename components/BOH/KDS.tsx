@@ -1,6 +1,6 @@
-import { Item } from "../types";
+import { Item } from "../../types";
 import { Ionicons } from "@expo/vector-icons";
-import { Timer } from "./Timer";
+import { Timer } from "../Timer";
 import { useState } from "react";
 import { View, TouchableOpacity, Text, FlatList }  from "react-native"; 
 
@@ -45,7 +45,7 @@ const KDSItemView = ({
 
   return (
     <TouchableOpacity
-      className={`flex flex-row items-center m-2 p-2 rounded-3xl border border-slate-500 ${completed ? "bg-slate-200 text-black" : assignBgTheme(item)}`}
+      className={`flex flex-row items-center m-1 p-2 rounded-xl border border-slate-500 ${completed ? "bg-slate-200 text-black" : assignBgTheme(item)}`}
       delayPressIn={0} 
       onPress={() => {
         if (completed) {
@@ -55,20 +55,20 @@ const KDSItemView = ({
         }
       }}
     >
-      <View className="flex-[4] font-semibold"><Text className="text-xl" numberOfLines={1}>{item.name}</Text></View>
-      <View className="flex-[1] items-center"><Text className="text-xl">#{item.batchSize}</Text></View>
+      <View className="flex-[4] font-semibold"><Text className="text-md" numberOfLines={1}>{item.name}</Text></View>
+      <View className="flex-[1] items-center"><Text className="text-md">#{item.batchSize}</Text></View>
       <View className="flex-[2] items-center">
         {
-          completed ? <Text className="text-xl text-slate-400">--:--</Text> : <Timer 
-            textSize="text-xl"
+          completed ? <Text className="text-md text-slate-400">--:--</Text> : <Timer 
+            textSize="text-md"
             textColor={active ? "text-white" : "text-black"} 
             startTimestamp={item.createdAt} 
           />
         }
       </View>
-      <View className="flex-[1] items-center"><Text className="text-xl">{item.waiting ? "⚠️" : " "}</Text></View>
-      <View className="flex-[2] items-center"><Text className="text-lg capitalize">{item.status}</Text></View>
-      <TouchableOpacity onPress={() => {
+      <View className="flex-[1] items-center"><Text className="text-md">{item.waiting ? "⚠️" : " "}</Text></View>
+      <View className="flex-[2] items-center"><Text className="text-md capitalize">{item.status}</Text></View>
+      <TouchableOpacity onPress={() => { 
         if (completed) return;
         onDelete(item.code);
       }} className="flex-[1] items-center text-black">
@@ -95,7 +95,7 @@ export const KDS = ({
 }: KDSProps) => {
   const [showHistory, setShowHistory] = useState(false);
   return (
-    <View className="rounded-2x p-6 overflow-auto w-1/2">
+    <View className="rounded-2x p-6 overflow-auto w-full">
       <View className="flex flex-row items-center mb-4">
         <Text className="text-2xl font-bold flex-1">{showHistory ? "History" : "Items"}</Text>
         <TouchableOpacity
@@ -116,7 +116,8 @@ export const KDS = ({
       </View>
       <FlatList
         data={showHistory ? history : items}
-        keyExtractor={(item) => item.code}
+        keyExtractor={(item) => item.code + item.id}
+        scrollEnabled
         numColumns={1}
         renderItem={({ item }) => (
           <KDSItemView

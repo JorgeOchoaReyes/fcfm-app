@@ -8,61 +8,74 @@ export const useNearbySync = () => {
     syncWithPeer, 
     connectedPeer, 
     setConnectedPeer, 
+    deviceId,
     isSearching, 
-    setIsSearching 
+    setIsSearching,
+    isConnected,
+    setIsConnected
   } = useStorageP2P();
   const [discoveredPeers, setDiscoveredPeers] = useState<Nearby.BasePeer[]>([]);
-  
-  const isConnected = useRef(false);
-
+   
   useEffect(() => {
-    isConnected.current = !!connectedPeer;
+    setIsConnected(!!connectedPeer);
   }, [connectedPeer]);
  
   const startP2P = useCallback(async () => {
-    if (isConnected.current) return;
+    if (isConnected) return;
     
     setIsSearching(true);
     try { 
       await Nearby.stopDiscovery();
       await Nearby.stopAdvertise(); 
-      await Nearby.startAdvertise("fcfm_panda", Nearby.Strategy.P2P_CLUSTER);
-      await Nearby.startDiscovery("fcfm_panda", Nearby.Strategy.P2P_CLUSTER);
+      await Nearby.startAdvertise(deviceId || "Unknown Device", Nearby.Strategy.P2P_CLUSTER);
+      await Nearby.startDiscovery(deviceId || "Unknown Device", Nearby.Strategy.P2P_CLUSTER);
     } catch (e) {
       console.error("P2P Init Error:", e);
     }
-  }, [setIsSearching]);
+  }, [setIsSearching, deviceId, isConnected]);
 
   useEffect(() => {
-    const inviteSub = Nearby.onInvitationReceived((event) => {
+    const inviteSub = Nearby.onInvitationReceived( async (event) => {
       console.log(`Handshake initiated with ${event.peerId}`); 
       if (!preferredPeerId || event.peerId === preferredPeerId) {
-        Nearby.acceptConnection(event.peerId);
-      } 
+        await Nearby.acceptConnection(event.peerId);
+      } else {
+        if(event.name === "BOH" || event.name === "FOH") {
+          await Nearby.acceptConnection(event.peerId);
+        }
+      }
     });
 
-    const foundSub = Nearby.onPeerFound((event) => {
+    const foundSub = Nearby.onPeerFound( async (event) => {
       if (!preferredPeerId || event.peerId === preferredPeerId) {
-        Nearby.acceptConnection(event.peerId);
+        await Nearby.acceptConnection(event.peerId);
+      } else {
+        if(event.name === "BOH" || event.name === "FOH") {
+          await Nearby.acceptConnection(event.peerId);
+        }
       }
-      setDiscoveredPeers(prev => [...prev, event]);
+      const peer = discoveredPeers.find(p => p.peerId === event.peerId);
+      if (!peer) {
+        setDiscoveredPeers(prev => [...prev, event]);
+      }
       setIsSearching(false);
     });
 
     const lostSub = Nearby.onPeerLost((event) => {
       console.log(`Peer lost: ${event.peerId}`);
+
       setDiscoveredPeers(prev => prev.filter(p => p.peerId !== event.peerId));
     });
 
     const connectSub = Nearby.onConnected((event) => {
-      isConnected.current = true;
+      setIsConnected(true);
       setConnectedPeer(event.peerId);
       setIsSearching(false);
       syncData(event.peerId);
     });
 
     const disconnectSub = Nearby.onDisconnected(() => {
-      isConnected.current = false;
+      setIsConnected(false);
       setConnectedPeer(null);
       startP2P(); 
     });
