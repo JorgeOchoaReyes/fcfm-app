@@ -53,11 +53,16 @@ export default function RootLayout() {
   }, [clearStorageDaily, clearPriorityQueue]);
 
   useEffect(() => {
-    const inviteSub = Nearby.onInvitationReceived((event) => {
+    const inviteSub = Nearby.onInvitationReceived( async (event) => {
       console.log(`Handshake initiated with ${event.peerId}`); 
+      alert(`Handshake initiated with ${event.peerId} - ${event.name}`);
       if (!preferredPeerId || event.peerId === preferredPeerId) {
-        Nearby.acceptConnection(event.peerId);
-      } 
+        await Nearby.acceptConnection(event.peerId);
+      } else {
+        if(event.name === "BOH" || event.name === "FOH") {
+          await Nearby.acceptConnection(event.peerId);
+        }
+      }
     }); 
   
     const disconnectSub = Nearby.onDisconnected(() => {
@@ -75,7 +80,7 @@ export default function RootLayout() {
       Nearby.stopDiscovery();
       Nearby.stopAdvertise();
     };
-  }, [preferredPeerId,]);
+  }, []);
   
 
   return <>

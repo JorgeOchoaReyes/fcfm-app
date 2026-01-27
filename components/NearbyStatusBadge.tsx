@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNearbySync } from "../hooks/useNearbySync";
 
 const NearbyStatusBadge = () => {
-  const { connectedPeer, isSearching, startP2P } = useNearbySync();
+  const { connectedPeer, isSearching } = useNearbySync();
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -48,8 +48,7 @@ const NearbyStatusBadge = () => {
   return (
     <View style={styles.container}>
       <TouchableOpacity 
-        style={[styles.badge, { borderColor: getStatusColor() }]} 
-        onPress={() => startP2P()}
+        style={[styles.badge, { borderColor: getStatusColor() }]}  
         activeOpacity={0.7}
       >
         <View style={styles.row}>

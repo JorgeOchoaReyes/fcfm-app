@@ -1,20 +1,18 @@
-import { ItemController } from "../components/Item-Controller"; 
+import { ItemController } from "../components/FOH/Item-Controller"; 
 import { items } from "../util/constants"; 
 import { usePriorityQueue } from "../hooks/usePriority-Queue"; 
-import { View, FlatList, Text } from "react-native"; 
+import { View, FlatList } from "react-native"; 
+import { FOHTableView } from "../components/FOH/FOHTable";
+import React from "react";
 
 export default function Home() {
 
   const {
     add,
     listActive,
-    listAll,
     listHistory,
-    remove,
     markWaiting,
-    findItem,
-    updateStatus,
-    recall,
+    findItem, 
     pq
   } = usePriorityQueue(); 
 
@@ -46,14 +44,21 @@ export default function Home() {
               onClickMarkWaiting={(code: string) => {
                 markWaiting(code);
               }}
-              timestampStarted={itemInQueue?.createdAt}
-              status={itemInQueue?.status ?? null}
             />;
           }}
         />   
       </View>
       <View className="h-16 flex-1">
-        <Text>New Table</Text>
+        <FOHTableView 
+          items={[
+            ...pq.inProgressItems,
+            ...pq.waitingItems,
+            ...pq.pendingItems,
+          ]}
+          history={[
+            ...pq.history
+          ]} 
+        />
       </View>
     </View>
   );

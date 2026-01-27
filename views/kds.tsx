@@ -1,26 +1,31 @@
 import { usePriorityQueue } from "../hooks/usePriority-Queue"; 
-import { Text, View } from "react-native";
-import { KDS } from "../components/KDS"; 
-import { useStorageP2P } from "../hooks/useStorage";
+import { FlatList, View } from "react-native";
+import { KDS } from "../components/BOH/KDS";  
+import { items } from "../util/constants"; 
+import { BOHItem } from "components/BOH/BOHButtons";
 
 export default function Home() {
 
-  const {
-    listActive,
-    listHistory,
+  const { 
+    pq,
     remove, 
     updateStatus,
+    add,
     recall,
   } = usePriorityQueue(); 
-
-  const { dateOfStorage } = useStorageP2P();
-
+ 
   return (
-    <View className={"flex font-sans bg-white h-screen"}>
-      <View className="flex flex-col h-screen justify-between"> 
+    <View className={"flex font-sans flex-row bg-white"}>
+      <View className="h-screen justify-start w-screen flex flex-row flex-1"> 
         <KDS
-          items={listActive()}
-          history={listHistory()}
+          items={[
+            ...pq.inProgressItems,
+            ...pq.waitingItems,
+            ...pq.pendingItems,
+          ]}
+          history={[
+            ...pq.history
+          ]}
           onRecall={(id: number) => {
             recall(id);
           }}
@@ -33,7 +38,29 @@ export default function Home() {
         /> 
       </View>
       <View className="h-16 flex-1">
-        <Text>New Table</Text>
+        <FlatList
+          keyExtractor={(item) => item.code}
+          numColumns={2}  
+          data={items} 
+          scrollEnabled
+          renderItem={({ item }) => { 
+            return <BOHItem
+              key={item.code}
+              item={item}
+              onClickAdd={(batch: number) => {
+                add({
+                  id: Date.now(),
+                  name: item.name,
+                  batchSize: batch,
+                  waiting: false,
+                  status: "pending",
+                  createdAt: Date.now(),
+                  code: item.code
+                });
+              }} 
+            />;
+          }}
+        />   
       </View>
     </View>
   );
