@@ -45,11 +45,12 @@ export default function RootLayout() {
     requestLocationNeabyDevicesPermission(); 
   }, []);
 
-  useEffect(() => { 
-    setInterval(() => {
+  useEffect(() => {  
+    const intervalId = setInterval(() => {
       // clearStorageDaily();
       // clearPriorityQueue();
-    }, 60 * 1000);
+    }, 30 * 60 * 1000 );
+    return () => clearInterval(intervalId);
   }, [clearStorageDaily, clearPriorityQueue]);
 
   useEffect(() => {
