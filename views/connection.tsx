@@ -88,7 +88,7 @@ export default function ConnectionPicker() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.header}>
         <View>
           <Text style={styles.headerSubtitle}>FCFM Network</Text>
@@ -208,7 +208,7 @@ export default function ConnectionPicker() {
           }
         />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -216,6 +216,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F8F9FA",
+    overflow: "scroll",
+    height: "100%",
   },
   header: {
     flexDirection: "row",
