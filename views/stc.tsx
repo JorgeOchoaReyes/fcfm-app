@@ -9,8 +9,6 @@ export default function Home() {
 
   const {
     add,
-    listActive,
-    listHistory,
     markWaiting,
     findItem, 
     pq

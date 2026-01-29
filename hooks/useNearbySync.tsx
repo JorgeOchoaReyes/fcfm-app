@@ -17,10 +17,6 @@ export const useNearbySync = () => {
     setIsConnected
   } = useStorageP2P();
   const [discoveredPeers, setDiscoveredPeers] = useState<Nearby.BasePeer[]>([]);
-   
-  useEffect(() => {
-    setIsConnected(!!connectedPeer);
-  }, [connectedPeer]);
  
   const startP2P = useCallback(async () => {
     if (isConnected) return;
@@ -61,21 +57,13 @@ export const useNearbySync = () => {
   useEffect(() => {
     const inviteSub = Nearby.onInvitationReceived( async (event) => {
       console.log(`Handshake initiated with ${event.peerId}`); 
-      if (!preferredPeerId || event.peerId === preferredPeerId) {
+      if (!preferredPeerId || event.peerId === preferredPeerId || event.name === "BOH" || event.name === "FOH") {
         await Nearby.acceptConnection(event.peerId);
         setIsConnected(true);
         setConnectedPeer(event.peerId);
         setDeviceName(event.name);
         setIsSearching(false); 
-      } else {
-        if(event.name === "BOH" || event.name === "FOH") {
-          await Nearby.acceptConnection(event.peerId);
-          setIsConnected(true);
-          setConnectedPeer(event.peerId);
-          setDeviceName(event.name);
-          setIsSearching(false); 
-        }
-      }
+      }  
     });
 
     const foundSub = Nearby.onPeerFound( async (event) => {
