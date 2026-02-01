@@ -51,7 +51,7 @@ export default function RootLayout() {
       // clearPriorityQueue();
     }, 30 * 60 * 1000 );
     return () => clearInterval(intervalId);
-  }, [clearStorageDaily, clearPriorityQueue]);
+  }, []);
 
   useEffect(() => {
     const inviteSub = Nearby.onInvitationReceived( async (event) => { 
@@ -80,6 +80,7 @@ export default function RootLayout() {
   
     const payloadSub = Nearby.onTextReceived((event) => {
       const incomingData = JSON.parse(event.text); 
+      alert(`Received data: ${event.text} from ${event.peerId}`);
     });
    
     return () => {  

@@ -126,10 +126,22 @@ export default function ConnectionPicker() {
           padding: 10,
           borderRadius: 10, 
           alignItems: "center",
+          marginRight: 10,
         }} onPress={() => {
           clearPriorityQueue();
         }}>
           <Text style={{...styles.sectionTitle, color: "white"}}>Clear PQ Storage</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={{
+          backgroundColor: "red",
+          padding: 10,
+          borderRadius: 10, 
+          alignItems: "center",
+        }} onPress={async () => {
+          alert("Sending test message to " + connectedPeer);
+          await Nearby.sendText(connectedPeer || "", "This a test message!");
+        }}>
+          <Text style={{...styles.sectionTitle, color: "white"}}>Test Send Payload</Text>
         </TouchableOpacity>
       </View> 
 

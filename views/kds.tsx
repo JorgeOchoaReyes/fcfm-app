@@ -53,7 +53,7 @@ export default function Home() {
                   name: item.name,
                   batchSize: batch,
                   waiting: false,
-                  status: "pending",
+                  status: "in-progress",
                   createdAt: Date.now(),
                   code: item.code
                 });

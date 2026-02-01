@@ -55,8 +55,7 @@ export const useNearbySync = () => {
   }, [setIsConnected, setConnectedPeer, setDeviceName]);
 
   useEffect(() => {
-    const inviteSub = Nearby.onInvitationReceived( async (event) => {
-      console.log(`Handshake initiated with ${event.peerId}`); 
+    const inviteSub = Nearby.onInvitationReceived( async (event) => { 
       if (!preferredPeerId || event.peerId === preferredPeerId || event.name === "BOH" || event.name === "FOH") {
         await Nearby.acceptConnection(event.peerId);
         setIsConnected(true);
@@ -66,20 +65,7 @@ export const useNearbySync = () => {
       }  
     });
 
-    const foundSub = Nearby.onPeerFound( async (event) => {
-      // if (!preferredPeerId || event.peerId === preferredPeerId) {
-      //   await Nearby.acceptConnection(event.peerId);
-      //   setIsConnected(true);
-      //   setConnectedPeer(event.peerId);
-      //   setIsSearching(false); 
-      // } else {
-      //   if(event.name === "BOH" || event.name === "FOH") {
-      //     await Nearby.acceptConnection(event.peerId);
-      //     setIsConnected(true);
-      //     setConnectedPeer(event.peerId);
-      //     setIsSearching(false); 
-      //   }
-      // }
+    const foundSub = Nearby.onPeerFound( async (event) => { 
       const peer = discoveredPeers.find(p => p.peerId === event.peerId);
       if (!peer) {
         setDiscoveredPeers(prev => [...prev, event]);
@@ -89,10 +75,10 @@ export const useNearbySync = () => {
 
     const lostSub = Nearby.onPeerLost((event) => {
       console.log(`Peer lost: ${event.peerId}`);
+      alert(`Peer lost: ${event.peerId}`);
       setIsConnected(false);
       setConnectedPeer(null);
       setDeviceName("");
-      alert(`Peer lost: ${event.peerId}`);
       setDiscoveredPeers(prev => prev.filter(p => p.peerId !== event.peerId));
     });
 
@@ -110,12 +96,7 @@ export const useNearbySync = () => {
       setDeviceName("");
       alert("Disconnected");
       startP2P(); 
-    });
-
-    const payloadSub = Nearby.onTextReceived((event) => {
-      const incomingData = JSON.parse(event.text);
-      syncWithPeer(incomingData);
-    });
+    }); 
 
     startP2P();
 
@@ -124,12 +105,11 @@ export const useNearbySync = () => {
       foundSub();
       connectSub();
       disconnectSub();
-      inviteSub();
-      payloadSub();
+      inviteSub(); 
       Nearby.stopDiscovery();
       Nearby.stopAdvertise();
     };
-  }, [startP2P, preferredPeerId, setConnectedPeer, setIsSearching, syncWithPeer]);
+  }, [startP2P, preferredPeerId, setConnectedPeer, setIsSearching]);
 
   const syncData = async (targetId: string) => {
     const state = {
