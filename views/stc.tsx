@@ -4,6 +4,7 @@ import { usePriorityQueue } from "../hooks/usePriority-Queue";
 import { View, FlatList } from "react-native"; 
 import { FOHTableView } from "../components/FOH/FOHTable";
 import React from "react";
+import { BOHItem } from "../components/BOH/BOHButtons";
 
 export default function Home() {
 
@@ -16,15 +17,14 @@ export default function Home() {
 
   return (
     <View className={"flex font-sans flex-row"}>
-      <View className="h-screen justify-start w-screen flex flex-row flex-1"> 
+      <View className="h-screen justify-start w-screen flex flex-row flex-1">   
         <FlatList
           keyExtractor={(item) => item.code}
           numColumns={2}  
           data={items} 
           scrollEnabled
           renderItem={({ item }) => { 
-            const itemInQueue = findItem(item.name);
-            return <ItemController
+            return <BOHItem
               key={item.code}
               item={item}
               onClickAdd={(batch: number) => {
@@ -33,15 +33,11 @@ export default function Home() {
                   name: item.name,
                   batchSize: batch,
                   waiting: false,
-                  status: "pending",
+                  status: "in-progress",
                   createdAt: Date.now(),
                   code: item.code
                 });
-              }}
-              waiting={itemInQueue?.waiting ?? false}
-              onClickMarkWaiting={(code: string) => {
-                markWaiting(code);
-              }}
+              }} 
             />;
           }}
         />   
