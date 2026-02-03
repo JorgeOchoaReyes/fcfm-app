@@ -1,4 +1,3 @@
-import { ItemController } from "../components/FOH/Item-Controller"; 
 import { items } from "../util/constants"; 
 import { usePriorityQueue } from "../hooks/usePriority-Queue"; 
 import { View, FlatList } from "react-native"; 
@@ -11,7 +10,7 @@ export default function Home() {
   const {
     add,
     markWaiting,
-    findItem, 
+    unmarkWaiting,
     pq
   } = usePriorityQueue(); 
 
@@ -33,7 +32,7 @@ export default function Home() {
                   name: item.name,
                   batchSize: batch,
                   waiting: false,
-                  status: "in-progress",
+                  status: "pending",
                   createdAt: Date.now(),
                   code: item.code
                 });
@@ -52,6 +51,12 @@ export default function Home() {
           history={[
             ...pq.history
           ]} 
+          markWaiting={(code: string) => {
+            markWaiting(code);
+          }}
+          unmarkWaiting={(code: string) => {
+            unmarkWaiting(code);
+          }}
         />
       </View>
     </View>
