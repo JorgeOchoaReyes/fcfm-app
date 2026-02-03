@@ -35,7 +35,7 @@ const requestLocationNeabyDevicesPermission = async () => {
 export default function RootLayout() {
   const router = useRouter();
   const pathname = usePathname();
-  const { clearStorageDaily, preferredPeerId, setConnectedPeer, setIsConnected, setDeviceName } = useStorageP2P();
+  const { clearStorageDaily, preferredPeerId, setConnectedPeer, setIsConnected, setDeviceName, connectedPeer } = useStorageP2P();
   const { clearPriorityQueue } = usePriorityQueue(); 
   const returnFunctiton = () => {
     router.navigate("/");
@@ -67,6 +67,7 @@ export default function RootLayout() {
           setIsConnected(true);
           setConnectedPeer(event.peerId);
           setDeviceName(event.name);
+          alert(`✅ Connection established with and confiremd in _layout ${event.name} (${event.peerId})`);
         }
       }
     }); 
@@ -76,21 +77,29 @@ export default function RootLayout() {
       setConnectedPeer(null);
       setDeviceName("");
       alert("Disconnected");
+    });   
+
+    // 3. THE MISSING PIECE: Listening for incoming sync data
+    const textSub = Nearby.onTextReceived((event) => {
+      console.log("📩 New Message Received:", event.text);
+      try {
+        const data = JSON.parse(event.text);
+        // Here is where you'd call your internal sync logic, e.g.:
+        // updateLocalState(data.nodes);
+        alert(`Sync received from ${event.peerId}`);
+      } catch (e) {
+        console.error("Failed to parse incoming sync text", e);
+      }
     });
-  
-    const payloadSub = Nearby.onTextReceived((event) => {
-      const incomingData = JSON.parse(event.text); 
-      alert(`Received data: ${event.text} from ${event.peerId}`);
-    });
-   
+
     return () => {  
       disconnectSub();
       inviteSub();
-      payloadSub();
+      textSub();
       Nearby.stopDiscovery();
       Nearby.stopAdvertise();
     };
-  }, []);
+  }, [preferredPeerId, connectedPeer]);
   
 
   return <>

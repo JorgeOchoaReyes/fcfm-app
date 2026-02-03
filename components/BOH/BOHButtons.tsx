@@ -21,13 +21,17 @@ export function BOHItem({
           </View>  
         </View>
         <View className="">
-          <View className=" rounded-lg overflow-hidden">
+          <View className="rounded-lg overflow-hidden">
             <View style={styles.table}> 
               <View style={styles.row}>
                 {[1, 2, 3].map((n) => (
                   <View key={n} style={styles.cell}>  
                     <TouchableOpacity
-                      style={styles.redButton}
+                      style={
+                        n === 1 ? styles.redButtonFirst : 
+                          n === 3 ? styles.redButtonLast : 
+                            styles.redButton
+                      }
                       onPress={() => onClickAdd(n)}
                       delayPressIn={0} 
                     >
@@ -50,12 +54,10 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "center", 
   },
   cell: {
-    flex: 1,
-    paddingHorizontal: 14,
-    paddingVertical: 4,
+    flex: 1, 
   },
   center: {
     alignItems: "center",
@@ -63,15 +65,37 @@ const styles = StyleSheet.create({
   redButton: {
     backgroundColor: "white",
     display: "flex",
-    justifyContent: "center",      
-    borderRadius: 24,
-    width: 30,
+    justifyContent: "center",       
+    borderTopWidth: 1,  
+    borderLeftWidth: 1, 
+    borderRightWidth: 1, 
+    borderColor: "red",  
+    height: 30, 
+    alignItems: "center",
+  }, 
+  redButtonFirst: {
+    backgroundColor: "white",
+    display: "flex",
+    justifyContent: "center",       
+    borderTopWidth: 1,   
+    borderRightWidth: 1, 
+    borderColor: "red",  
+    height: 30, 
+    alignItems: "center",
+  }, 
+  redButtonLast: {
+    backgroundColor: "white",
+    display: "flex",
+    justifyContent: "center",       
+    borderTopWidth: 1,  
+    borderLeftWidth: 1,  
+    borderColor: "red",  
     height: 30, 
     alignItems: "center",
   }, 
   buttonText: {
     color: "black",
-    fontWeight: "600",
+    fontWeight: "bold",
   },
   headerText: {
     fontSize: 12,

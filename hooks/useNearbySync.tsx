@@ -5,33 +5,33 @@ import { useStorageP2P } from "../hooks/useStorage";
 export const useNearbySync = () => {
   const { 
     preferredPeerId, 
-    syncWithPeer, 
-    connectedPeer, 
     setConnectedPeer, 
     deviceId,
-    deviceName,
     setDeviceName,
-    isSearching, 
     setIsSearching,
     isConnected,
+    isSearching,
     setIsConnected
   } = useStorageP2P();
+
   const [discoveredPeers, setDiscoveredPeers] = useState<Nearby.BasePeer[]>([]);
- 
+
   const startP2P = useCallback(async () => {
-    if (isConnected) return;
-    
+    // Note: Removed the isConnected guard here to allow re-broadcast if one side drops
     setIsSearching(true);
     try { 
-      alert("Braodcasting as: " + deviceId);
+      // Stop any existing processes to clear the internal state
       await Nearby.stopDiscovery();
       await Nearby.stopAdvertise(); 
+      
+      // Using your deviceId as the "Service ID" as well as the name
       await Nearby.startAdvertise(deviceId || "Unknown Device", Nearby.Strategy.P2P_CLUSTER);
       await Nearby.startDiscovery(deviceId || "Unknown Device", Nearby.Strategy.P2P_CLUSTER);
+      console.log("P2P Started as:", deviceId);
     } catch (e) {
       console.error("P2P Init Error:", e);
     }
-  }, [setIsSearching, deviceId, isConnected]);
+  }, [setIsSearching, deviceId]);
 
   const stopP2P = useCallback(async () => {
     try {
@@ -55,75 +55,103 @@ export const useNearbySync = () => {
   }, [setIsConnected, setConnectedPeer, setDeviceName]);
 
   useEffect(() => {
-    const inviteSub = Nearby.onInvitationReceived( async (event) => { 
-      if (!preferredPeerId || event.peerId === preferredPeerId || event.name === "BOH" || event.name === "FOH") {
-        await Nearby.acceptConnection(event.peerId);
-        setIsConnected(true);
-        setConnectedPeer(event.peerId);
-        setDeviceName(event.name);
-        setIsSearching(false); 
+    // 1. The Handshake Request
+    const inviteSub = Nearby.onInvitationReceived(async (event) => { 
+      // Only accept if it matches your specific logic
+      if (!preferredPeerId || event.peerId === preferredPeerId || ["BOH", "FOH"].includes(event.name)) {
+        console.log("Accepting invitation from:", event.name);
+        await Nearby.acceptConnection(event.peerId); 
       }  
     });
 
-    const foundSub = Nearby.onPeerFound( async (event) => { 
-      const peer = discoveredPeers.find(p => p.peerId === event.peerId);
-      if (!peer) {
-        setDiscoveredPeers(prev => [...prev, event]);
-      }
-      setIsSearching(false);
-    });
-
-    const lostSub = Nearby.onPeerLost((event) => {
-      console.log(`Peer lost: ${event.peerId}`);
-      alert(`Peer lost: ${event.peerId}`);
-      setIsConnected(false);
-      setConnectedPeer(null);
-      setDeviceName("");
-      setDiscoveredPeers(prev => prev.filter(p => p.peerId !== event.peerId));
-    });
-
+    // 2. The Confirmation (The "Actually Connected" state)
     const connectSub = Nearby.onConnected((event) => {
+      console.log(`✅ Connection established with ${event.name} (${event.peerId})`);
+      alert(`✅ Connection established with ${event.name} (${event.peerId})`);
       setIsConnected(true);
       setConnectedPeer(event.peerId);
       setDeviceName(event.name);
       setIsSearching(false); 
-      alert("Connected to " + event.peerId + " " + event.name);
     });
 
-    const disconnectSub = Nearby.onDisconnected(() => {
+    // 3. THE MISSING PIECE: Listening for incoming sync data
+    const textSub = Nearby.onTextReceived((event) => {
+      console.log("📩 New Message Received:", event.text);
+      try {
+        const data = JSON.parse(event.text);
+        // Here is where you'd call your internal sync logic, e.g.:
+        // updateLocalState(data.nodes);
+        alert(`Sync received from ${event.peerId}`);
+      } catch (e) {
+        console.error("Failed to parse incoming sync text", e);
+      }
+    });
+
+    const foundSub = Nearby.onPeerFound((event) => { 
+      setDiscoveredPeers(prev => {
+        const exists = prev.find(p => p.peerId === event.peerId);
+        return exists ? prev : [...prev, event];
+      });
+    });
+
+    const lostSub = Nearby.onPeerLost((event) => {
+      setDiscoveredPeers(prev => prev.filter(p => p.peerId !== event.peerId));
+      if (event.peerId === preferredPeerId) {
+        setIsConnected(false);
+        setConnectedPeer(null);
+      }
+    });
+
+    const disconnectSub = Nearby.onDisconnected((event) => {
+      console.log("Disconnected from:", event.peerId);
       setIsConnected(false);
       setConnectedPeer(null);
       setDeviceName("");
-      alert("Disconnected");
+      // Restart broadcasting to allow reconnection
       startP2P(); 
     }); 
 
     startP2P();
 
     return () => { 
-      lostSub();
-      foundSub();
+      inviteSub();
       connectSub();
+      textSub();
+      foundSub();
+      lostSub();
       disconnectSub();
-      inviteSub(); 
       Nearby.stopDiscovery();
       Nearby.stopAdvertise();
     };
-  }, [startP2P, preferredPeerId, setConnectedPeer, setIsSearching]);
+  }, [startP2P, preferredPeerId, setConnectedPeer, setIsConnected, setIsSearching, setDeviceName]);
 
   const syncData = async (targetId: string) => {
-    const state = {
-      head: "",
+    if (!targetId || !isConnected) {
+      console.warn("Attempted to sync while disconnected");
+      return;
+    }
+
+    const dataToSend = JSON.stringify({
+      head: "", // Populate these as needed
       nodes: [],
       lastUpdated: Date.now()
-    };
-    const dataToSend = JSON.stringify({
-      head: state.head,
-      nodes: state.nodes,
-      lastUpdated: state.lastUpdated
     });
-    await Nearby.sendText(targetId, dataToSend);
+
+    try {
+      await Nearby.sendText(targetId, dataToSend);
+      console.log("✈️ Data sent successfully to:", targetId);
+    } catch (e) {
+      console.error("Sync Send Error:", e);
+    }
   };
 
-  return { connectedPeer, isSearching, discoveredPeers, startP2P, stopP2P, disconnect, syncData };
+  return { 
+    connectedPeer: isConnected ? preferredPeerId : null, // or use your state variable
+    isSearching, 
+    discoveredPeers, 
+    startP2P, 
+    stopP2P, 
+    disconnect, 
+    syncData 
+  };
 };

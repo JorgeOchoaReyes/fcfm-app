@@ -67,13 +67,15 @@ const KDSItemView = ({
         }
       </View>
       <View className="flex-[1] items-center"><Text className="text-md">{item.waiting ? "⚠️" : " "}</Text></View>
-      <View className="flex-[2] items-center"><Text className="text-md capitalize">{item.status}</Text></View>
-      <TouchableOpacity onPress={() => { 
+      <View className="flex-[2] items-center"><Text className="text-md capitalize">
+        {item.status === "in-progress" ? "cooking" : item.status}
+      </Text></View>
+      {/* <TouchableOpacity onPress={() => { 
         if (completed) return;
         onDelete(item.code);
       }} className="flex-[1] items-center text-black">
         <Ionicons name="trash" size={24} color="black" />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </TouchableOpacity>
   );
 };
@@ -111,8 +113,7 @@ export const KDS = ({
         <Text className="flex-[1] font-bold text-slate-500 uppercase text-xs text-center">Batch</Text>
         <Text className="flex-[2] font-bold text-slate-500 uppercase text-xs text-center">Time</Text>
         <Text className="flex-[1] font-bold text-slate-500 uppercase text-xs text-center">Wait</Text>
-        <Text className="flex-[2] font-bold text-slate-500 uppercase text-xs text-center">Status</Text>
-        <Text className="flex-[1] font-bold text-slate-500 uppercase text-xs text-center">Action</Text>
+        <Text className="flex-[2] font-bold text-slate-500 uppercase text-xs text-center">Status</Text> 
       </View>
       <FlatList
         data={showHistory ? history : items}

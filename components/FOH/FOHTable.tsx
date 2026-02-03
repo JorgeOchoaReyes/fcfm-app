@@ -1,5 +1,4 @@
-import { Item } from "../../types";
-import { Ionicons } from "@expo/vector-icons";
+import { Item } from "../../types"; 
 import { Timer } from "../Timer";
 import { useState } from "react";
 import { View, TouchableOpacity, Text, FlatList }  from "react-native"; 
@@ -30,15 +29,22 @@ const assignBgTheme = (item: Item): string => {
 const KDSItemView = ({
   item,
   itemCompleted = false,
+  onPress,
+  unmarkWaiting,
 }: {
   item: Item;
   itemCompleted: boolean; 
+  onPress: () => void;
+  unmarkWaiting: (code: string) => void;
 }) => {
   const active = (item.status === "in-progress" || item.waiting);
   const completed = itemCompleted;
 
   return (
-    <View
+    <TouchableOpacity
+      onPress={
+        item.waiting ? () => unmarkWaiting(item.code) : () => onPress()
+      }
       className={`flex flex-row items-center p-2 m-1 rounded-xl ${completed ? "bg-slate-200 text-black" : assignBgTheme(item)}`}
     >
       <View className="flex-[4] font-semibold"><Text className="text-xl" numberOfLines={1}>{item.name}</Text></View>
@@ -54,18 +60,22 @@ const KDSItemView = ({
       </View>
       <View className="flex-[1] items-center"><Text className="text-xl">{item.waiting ? "⚠️" : " "}</Text></View>
       <View className="flex-[2] items-center"><Text className="text-lg capitalize">{item.status}</Text></View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
 interface FOHTableViewProps {
   items: Item[];
   history: Item[]; 
+  markWaiting: (code: string) => void;
+  unmarkWaiting: (code: string) => void;
 }
 
 export const FOHTableView = ({
   items,
   history, 
+  markWaiting,
+  unmarkWaiting,
 }: FOHTableViewProps) => {
   const [showHistory, setShowHistory] = useState(false);
   return (
@@ -96,6 +106,8 @@ export const FOHTableView = ({
             key={item.id}
             item={item} 
             itemCompleted={item.status === "completed"} 
+            onPress={() => markWaiting(item.code)}
+            unmarkWaiting={unmarkWaiting}
           />
         )}
       />  

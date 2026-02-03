@@ -24,6 +24,7 @@ interface PriorityQueueStorage {
   findItem: (name: string) => Item | null; 
   updateStatus: (code: string) => void;
   clearPriorityQueue: () => void;
+  unmarkWaiting: (code: string) => void;
 }
 
 const getCategory = (item: Item) => {
@@ -228,6 +229,36 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
             instanceTracker: {},
             waitingTracker: {}
           }
+        });
+      },
+      unmarkWaiting: (code: string) => {
+        const { pq } = get();
+        if (!pq.instanceTracker[code] || !pq.waitingTracker[code]) {
+          alert(!pq.instanceTracker[code] ? "Item not in queue!" : "Item is not waiting!");
+          return;
+        }
+
+        set((state) => {
+          const newPq = { ...state.pq };
+          let target: Item | undefined;
+
+          if (newPq.waitingItems.some(i => i.code === code)) {
+            target = newPq.waitingItems.find(i => i.code === code)!;
+            newPq.waitingItems = newPq.waitingItems.filter(i => i.code !== code);
+          }
+
+          if (target) {
+            const { [code]: _, ...remainingWaiting } = newPq.waitingTracker;
+            return {
+              pq: {
+                ...newPq,
+                waitingItems: newPq.waitingItems,
+                waitingTracker: remainingWaiting
+              }
+            };
+          }
+
+          return state;
         });
       }
     }),
