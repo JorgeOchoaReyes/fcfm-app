@@ -7,7 +7,17 @@ import { useNearbySync } from "../hooks/useNearbySync";
 import { usePriorityQueue } from "hooks/usePriority-Queue";
 
 export default function ConnectionPicker() {
-  const { preferredPeerId, setPreferredPeer, deviceId, setDeviceId, deviceName, connectedPeer, clearStorage } = useStorageP2P();
+  const { 
+    preferredPeerId, 
+    setPreferredPeer, 
+    deviceId, 
+    setDeviceId, 
+    isHub, 
+    setIsHub, 
+    connectedPeerId, 
+    connectedPeerName, 
+    clearStorage 
+  } = useStorageP2P();
   const { discoveredPeers, isSearching, startP2P, stopP2P, disconnect } = useNearbySync();
   const { clearPriorityQueue } = usePriorityQueue();
   const [isEditingId, setIsEditingId] = useState(false);
@@ -30,7 +40,7 @@ export default function ConnectionPicker() {
 
   const renderPeerItem = ({ item }: { item: Nearby.BasePeer }) => {
     const isPreferred = preferredPeerId === item.peerId;
-    const isCurrentConnected = connectedPeer === item.peerId;
+    const isCurrentConnected = connectedPeerId === item.peerId;
 
     return (
       <View style={[styles.card, isCurrentConnected && styles.connectedCard]}>
@@ -119,7 +129,7 @@ export default function ConnectionPicker() {
         }} onPress={() => {
           clearStorage();
         }}>
-          <Text style={{...styles.sectionTitle, color: "white"}}>Clear General Storage</Text>
+          <Text style={{...styles.sectionTitle, color: "white"}}>Clear P2P Storage</Text>
         </TouchableOpacity>
         <TouchableOpacity style={{
           backgroundColor: "red",
@@ -138,12 +148,45 @@ export default function ConnectionPicker() {
           borderRadius: 10, 
           alignItems: "center",
         }} onPress={async () => {
-          alert("Sending test message to " + connectedPeer);
-          await Nearby.sendText(connectedPeer || "", "This a test message!");
+          alert("Sending test message to " + connectedPeerId);
+          try{
+            await Nearby.sendText(connectedPeerId || "", "This a test message!");
+          }catch(e){
+            alert("Error sending message: " + e);
+          }
         }}>
           <Text style={{...styles.sectionTitle, color: "white"}}>Test Send Payload</Text>
         </TouchableOpacity>
       </View> 
+
+      <View>  
+        <Text> 
+          Status: {isHub ? "Hub" : "Client"}
+        </Text>
+        <TouchableOpacity style={{
+          backgroundColor: "red",
+          padding: 10,
+          borderRadius: 10, 
+          marginRight: 10,
+          alignItems: "center",
+        }} onPress={() => {
+          setIsHub(true);
+        }}>
+          <Text style={{...styles.sectionTitle, color: "white"}}>Make Hub</Text>
+        </TouchableOpacity>
+        <Text> Make device client</Text>
+        <TouchableOpacity style={{
+          backgroundColor: "red",
+          padding: 10,
+          borderRadius: 10, 
+          marginRight: 10,
+          alignItems: "center",
+        }} onPress={() => {
+          setIsHub(false);
+        }}>
+          <Text style={{...styles.sectionTitle, color: "white"}}>Make Client</Text>
+        </TouchableOpacity>
+      </View>
 
       <View style={styles.myDeviceSection}>
         <View style={styles.sectionHeader}>
@@ -196,8 +239,8 @@ export default function ConnectionPicker() {
         <FlatList
           data={[
             {
-              peerId: connectedPeer || "",
-              name: deviceName || ""
+              peerId: connectedPeerId || "",
+              name: connectedPeerName || ""
             },
             ...discoveredPeers
           ].filter(p => p.peerId !== "")}

@@ -5,13 +5,14 @@ import { useStorageP2P } from "../hooks/useStorage";
 export const useNearbySync = () => {
   const { 
     preferredPeerId, 
-    setConnectedPeer, 
-    deviceId,
-    setDeviceName,
+    setConnectedPeerId, 
+    deviceId, 
     setIsSearching,
+    setConnectedPeerName,
     isConnected,
     isSearching,
-    setIsConnected
+    setIsConnected,
+    isHub
   } = useStorageP2P();
 
   const [discoveredPeers, setDiscoveredPeers] = useState<Nearby.BasePeer[]>([]);
@@ -19,14 +20,16 @@ export const useNearbySync = () => {
   const startP2P = useCallback(async () => {
     // Note: Removed the isConnected guard here to allow re-broadcast if one side drops
     setIsSearching(true);
-    try { 
-      // Stop any existing processes to clear the internal state
+    try {  
       await Nearby.stopDiscovery();
       await Nearby.stopAdvertise(); 
-      
-      // Using your deviceId as the "Service ID" as well as the name
-      await Nearby.startAdvertise(deviceId || "Unknown Device", Nearby.Strategy.P2P_CLUSTER);
-      await Nearby.startDiscovery(deviceId || "Unknown Device", Nearby.Strategy.P2P_CLUSTER);
+
+      if(isHub) {
+        await Nearby.startAdvertise(deviceId || "Unknown Device");
+      } else {
+        await Nearby.startDiscovery(deviceId || "Unknown Device");
+      }
+       
       console.log("P2P Started as:", deviceId);
     } catch (e) {
       console.error("P2P Init Error:", e);
@@ -47,12 +50,12 @@ export const useNearbySync = () => {
     try {
       await Nearby.disconnect(peerId);
       setIsConnected(false);
-      setConnectedPeer(null);
-      setDeviceName("");
+      setConnectedPeerId(null);
+      setConnectedPeerName("");
     } catch (e) {
       console.error("Disconnect Error:", e);
     }
-  }, [setIsConnected, setConnectedPeer, setDeviceName]);
+  }, [setIsConnected, setConnectedPeerId, setConnectedPeerName]);
 
   useEffect(() => {
     // 1. The Handshake Request
@@ -60,7 +63,11 @@ export const useNearbySync = () => {
       // Only accept if it matches your specific logic
       if (!preferredPeerId || event.peerId === preferredPeerId || ["BOH", "FOH"].includes(event.name)) {
         console.log("Accepting invitation from:", event.name);
-        await Nearby.acceptConnection(event.peerId); 
+        try {
+          await Nearby.acceptConnection(event.peerId); 
+        } catch (e) {
+          alert("Error accepting connection: " + e);
+        }
       }  
     });
 
@@ -69,19 +76,16 @@ export const useNearbySync = () => {
       console.log(`✅ Connection established with ${event.name} (${event.peerId})`);
       alert(`✅ Connection established with ${event.name} (${event.peerId})`);
       setIsConnected(true);
-      setConnectedPeer(event.peerId);
-      setDeviceName(event.name);
-      setIsSearching(false); 
+      setConnectedPeerId(event.peerId);
+      setConnectedPeerName(event.name);
+      setIsSearching(false);  
     });
 
     // 3. THE MISSING PIECE: Listening for incoming sync data
     const textSub = Nearby.onTextReceived((event) => {
       console.log("📩 New Message Received:", event.text);
       try {
-        const data = JSON.parse(event.text);
-        // Here is where you'd call your internal sync logic, e.g.:
-        // updateLocalState(data.nodes);
-        alert(`Sync received from ${event.peerId}`);
+        alert(`Sync received from ${event.peerId} ${event.text}`);
       } catch (e) {
         console.error("Failed to parse incoming sync text", e);
       }
@@ -98,16 +102,16 @@ export const useNearbySync = () => {
       setDiscoveredPeers(prev => prev.filter(p => p.peerId !== event.peerId));
       if (event.peerId === preferredPeerId) {
         setIsConnected(false);
-        setConnectedPeer(null);
+        setConnectedPeerId(null);
+        setConnectedPeerName("");
       }
     });
 
     const disconnectSub = Nearby.onDisconnected((event) => {
       console.log("Disconnected from:", event.peerId);
       setIsConnected(false);
-      setConnectedPeer(null);
-      setDeviceName("");
-      // Restart broadcasting to allow reconnection
+      setConnectedPeerId(null);
+      setConnectedPeerName(""); 
       startP2P(); 
     }); 
 
@@ -123,7 +127,7 @@ export const useNearbySync = () => {
       Nearby.stopDiscovery();
       Nearby.stopAdvertise();
     };
-  }, [startP2P, preferredPeerId, setConnectedPeer, setIsConnected, setIsSearching, setDeviceName]);
+  }, [startP2P, preferredPeerId, setConnectedPeerId, setConnectedPeerName, setIsConnected, setIsSearching]);
 
   const syncData = async (targetId: string) => {
     if (!targetId || !isConnected) {

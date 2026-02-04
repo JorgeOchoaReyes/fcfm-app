@@ -5,24 +5,29 @@ import { getFormattedDate } from "util/constants";
 
 interface DBStorage {
   priorityQueueStorage: string;
-  lastUpdated: number;
-  preferredPeerId: string | null;
   dateOfStorage: string; 
-  deviceId: string;
-  connectedPeer: string | null;
+  lastUpdated: number;
+  
+  preferredPeerId: string | null;
+  deviceId: string; 
+
+  connectedPeerId: string | null;
+  connectedPeerName: string;
+  
   isSearching: boolean;
   isConnected: boolean;
-  deviceName: string;
-  setDeviceName: (name: string) => void;
+  isHub: boolean;
+ 
   setIsConnected: (connected: boolean) => void;
   setDeviceId: (id: string) => void;
-  setConnectedPeer: (id: string | null) => void;
+  setConnectedPeerId: (id: string | null) => void;
+  setConnectedPeerName: (name: string) => void;
   setIsSearching: (searching: boolean) => void;
-  setPreferredPeer: (id: string | null) => void;
-  syncWithPeer: (incomingData: string) => void;
+  setPreferredPeer: (id: string | null) => void; 
   updatePriorityQueueStorage: (incomingData: string) => void;
   clearStorage: () => void;
   clearStorageDaily: () => void;
+  setIsHub: (hub: boolean) => void;
 }
 
 export const useStorageP2P  = create<DBStorage>()(
@@ -32,27 +37,25 @@ export const useStorageP2P  = create<DBStorage>()(
       lastUpdated: 0, 
       preferredPeerId: null,
       dateOfStorage: getFormattedDate(), 
-      deviceId: "",
-      connectedPeer: null,
+      
+      deviceId: "", 
+
+      connectedPeerId: null,
+      connectedPeerName: "",
       isSearching: false,
       isConnected: false,
-      deviceName: "",
-      setDeviceName: (name: string) => set({ deviceName: name }),
+      isHub: false,
+       
+      setDeviceId: (id: string) => set({ deviceId: id }),
+
+      setConnectedPeerId: (id: string | null) => set({ connectedPeerId: id }),
+      setConnectedPeerName: (name: string) => set({ connectedPeerName: name }),
+      setPreferredPeer: (id: string | null) => set({ preferredPeerId: id }),
+      setIsHub: (hub: boolean) => set({ isHub: hub }),
 
       setIsConnected: (connected: boolean) => set({ isConnected: connected }),
-      setDeviceId: (id: string) => set({ deviceId: id }),
-      setConnectedPeer: (id: string | null) => set({ connectedPeer: id }),
       setIsSearching: (searching: boolean) => set({ isSearching: searching }),
-      setPreferredPeer: (id: string | null) => set({ preferredPeerId: id }),
-      syncWithPeer: (incomingData: string) => {
-        const localTime = get().lastUpdated;
-        // If the peer's data is newer, accept it
-        // if (incomingData.lastUpdated > localTime) {
-        //   set({
-        //     priorityQueueStorage: incomingData.priorityQueueStorage,
-        //     lastUpdated: incomingData.lastUpdated
-        //   });
-      },
+
       updatePriorityQueueStorage: (incomingData: string) => {
         set({
           priorityQueueStorage: incomingData
