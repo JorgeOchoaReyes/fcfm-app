@@ -35,7 +35,14 @@ const requestLocationNeabyDevicesPermission = async () => {
 export default function RootLayout() {
   const router = useRouter();
   const pathname = usePathname();
-  const { clearStorageDaily, preferredPeerId, setConnectedPeer, setIsConnected, setDeviceName, connectedPeer } = useStorageP2P();
+  const { 
+    clearStorageDaily, 
+    preferredPeerId, 
+    setConnectedPeerId, 
+    setConnectedPeerName, 
+    setIsConnected, 
+    connectedPeerId 
+  } = useStorageP2P();
   const { clearPriorityQueue } = usePriorityQueue(); 
   const returnFunctiton = () => {
     router.navigate("/");
@@ -59,14 +66,14 @@ export default function RootLayout() {
       if (!preferredPeerId || event.peerId === preferredPeerId) {
         await Nearby.acceptConnection(event.peerId);
         setIsConnected(true);
-        setConnectedPeer(event.peerId);
-        setDeviceName(event.name);
+        setConnectedPeerId(event.peerId);
+        setConnectedPeerName(event.name);
       } else {
         if(event.name === "BOH" || event.name === "FOH") {
           await Nearby.acceptConnection(event.peerId);
           setIsConnected(true);
-          setConnectedPeer(event.peerId);
-          setDeviceName(event.name);
+          setConnectedPeerId(event.peerId);
+          setConnectedPeerName(event.name);
           alert(`✅ Connection established with and confiremd in _layout ${event.name} (${event.peerId})`);
         }
       }
@@ -74,8 +81,8 @@ export default function RootLayout() {
   
     const disconnectSub = Nearby.onDisconnected(() => { 
       setIsConnected(false);
-      setConnectedPeer(null);
-      setDeviceName("");
+      setConnectedPeerId(null);
+      setConnectedPeerName("");
       alert("Disconnected");
     });   
 
@@ -99,7 +106,7 @@ export default function RootLayout() {
       Nearby.stopDiscovery();
       Nearby.stopAdvertise();
     };
-  }, [preferredPeerId, connectedPeer]);
+  }, [preferredPeerId, connectedPeerId]);
   
 
   return <>
