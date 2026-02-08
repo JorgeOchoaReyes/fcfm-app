@@ -55,7 +55,8 @@ export default function Home() {
                   waiting: false,
                   status: "in-progress",
                   createdAt: Date.now(),
-                  code: item.code
+                  code: item.code,
+                  chineseName: item.chineseName
                 });
               }} 
             />;

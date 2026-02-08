@@ -121,7 +121,7 @@ export default function ConnectionPicker() {
         marginRight: 10,
       }}>
         <TouchableOpacity style={{
-          backgroundColor: "red",
+          backgroundColor: "#4A90E2",
           padding: 10,
           borderRadius: 10, 
           marginRight: 10,
@@ -132,7 +132,7 @@ export default function ConnectionPicker() {
           <Text style={{...styles.sectionTitle, color: "white"}}>Clear P2P Storage</Text>
         </TouchableOpacity>
         <TouchableOpacity style={{
-          backgroundColor: "red",
+          backgroundColor: "#4A90E2",
           padding: 10,
           borderRadius: 10, 
           alignItems: "center",
@@ -143,7 +143,7 @@ export default function ConnectionPicker() {
           <Text style={{...styles.sectionTitle, color: "white"}}>Clear PQ Storage</Text>
         </TouchableOpacity>
         <TouchableOpacity style={{
-          backgroundColor: "red",
+          backgroundColor: "#4A90E2",
           padding: 10,
           borderRadius: 10, 
           alignItems: "center",
@@ -160,32 +160,33 @@ export default function ConnectionPicker() {
       </View> 
 
       <View>  
-        <Text> 
+        <Text style={{textAlign: "center", fontSize: 20, fontWeight: "bold"}}> 
           Status: {isHub ? "Hub" : "Client"}
         </Text>
-        <TouchableOpacity style={{
-          backgroundColor: "red",
-          padding: 10,
-          borderRadius: 10, 
-          marginRight: 10,
-          alignItems: "center",
-        }} onPress={() => {
-          setIsHub(true);
-        }}>
-          <Text style={{...styles.sectionTitle, color: "white"}}>Make Hub</Text>
-        </TouchableOpacity>
-        <Text> Make device client</Text>
-        <TouchableOpacity style={{
-          backgroundColor: "red",
-          padding: 10,
-          borderRadius: 10, 
-          marginRight: 10,
-          alignItems: "center",
-        }} onPress={() => {
-          setIsHub(false);
-        }}>
-          <Text style={{...styles.sectionTitle, color: "white"}}>Make Client</Text>
-        </TouchableOpacity>
+        <View style={{flexDirection: "row", alignItems: "center", justifyContent: "center"}}> 
+          <TouchableOpacity style={{
+            backgroundColor: "#4A90E2",
+            padding: 10,
+            borderRadius: 10, 
+            marginRight: 10,
+            alignItems: "center",
+          }} onPress={() => {
+            setIsHub(true);
+          }}>
+            <Text style={{...styles.sectionTitle, color: "white"}}>Make Hub</Text>
+          </TouchableOpacity> 
+          <TouchableOpacity style={{
+            backgroundColor: "#4A90E2",
+            padding: 10,
+            borderRadius: 10, 
+            marginRight: 10,
+            alignItems: "center",
+          }} onPress={() => {
+            setIsHub(false);
+          }}>
+            <Text style={{...styles.sectionTitle, color: "white"}}>Make Client</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.myDeviceSection}>

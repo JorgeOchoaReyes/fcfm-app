@@ -35,8 +35,7 @@ const requestLocationNeabyDevicesPermission = async () => {
 export default function RootLayout() {
   const router = useRouter();
   const pathname = usePathname();
-  const { 
-    clearStorageDaily, 
+  const {  
     preferredPeerId, 
     setConnectedPeerId, 
     setConnectedPeerName, 
@@ -53,31 +52,22 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {  
-    const intervalId = setInterval(() => {
-      // clearStorageDaily();
-      // clearPriorityQueue();
+    const intervalId = setInterval(() => { 
     }, 30 * 60 * 1000 );
     return () => clearInterval(intervalId);
   }, []);
 
   useEffect(() => {
-    const inviteSub = Nearby.onInvitationReceived( async (event) => { 
-      alert(`Handshake initiated with ${event.peerId} - ${event.name}`);
-      if (!preferredPeerId || event.peerId === preferredPeerId) {
-        await Nearby.acceptConnection(event.peerId);
-        setIsConnected(true);
-        setConnectedPeerId(event.peerId);
-        setConnectedPeerName(event.name);
-      } else {
-        if(event.name === "BOH" || event.name === "FOH") {
-          await Nearby.acceptConnection(event.peerId);
-          setIsConnected(true);
-          setConnectedPeerId(event.peerId);
-          setConnectedPeerName(event.name);
-          alert(`✅ Connection established with and confiremd in _layout ${event.name} (${event.peerId})`);
+    const inviteSub = Nearby.onInvitationReceived(async (event) => {  
+      if (!preferredPeerId || event.peerId === preferredPeerId || ["BOH", "FOH"].includes(event.name)) {
+        console.log("Accepting invitation from:", event.name);
+        try {
+          await Nearby.acceptConnection(event.peerId); 
+        } catch (e) {
+          alert("Error accepting connection: " + e);
         }
-      }
-    }); 
+      }  
+    });
   
     const disconnectSub = Nearby.onDisconnected(() => { 
       setIsConnected(false);
@@ -85,14 +75,11 @@ export default function RootLayout() {
       setConnectedPeerName("");
       alert("Disconnected");
     });   
-
-    // 3. THE MISSING PIECE: Listening for incoming sync data
+ 
     const textSub = Nearby.onTextReceived((event) => {
       console.log("📩 New Message Received:", event.text);
       try {
-        const data = JSON.parse(event.text);
-        // Here is where you'd call your internal sync logic, e.g.:
-        // updateLocalState(data.nodes);
+        const data = JSON.parse(event.text); 
         alert(`Sync received from ${event.peerId}`);
       } catch (e) {
         console.error("Failed to parse incoming sync text", e);

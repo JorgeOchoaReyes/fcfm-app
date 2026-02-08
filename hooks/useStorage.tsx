@@ -1,12 +1,8 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getFormattedDate } from "util/constants"; 
+import AsyncStorage from "@react-native-async-storage/async-storage"; 
 
-interface DBStorage {
-  priorityQueueStorage: string;
-  dateOfStorage: string; 
-  lastUpdated: number;
+interface DBStorage {   
   
   preferredPeerId: string | null;
   deviceId: string; 
@@ -17,36 +13,34 @@ interface DBStorage {
   isSearching: boolean;
   isConnected: boolean;
   isHub: boolean;
+  showChinese: boolean;
  
   setIsConnected: (connected: boolean) => void;
   setDeviceId: (id: string) => void;
   setConnectedPeerId: (id: string | null) => void;
   setConnectedPeerName: (name: string) => void;
   setIsSearching: (searching: boolean) => void;
-  setPreferredPeer: (id: string | null) => void; 
-  updatePriorityQueueStorage: (incomingData: string) => void;
-  clearStorage: () => void;
-  clearStorageDaily: () => void;
+  setPreferredPeer: (id: string | null) => void;  
+  clearStorage: () => void; 
   setIsHub: (hub: boolean) => void;
+  setShowChinese: (showChinese: boolean) => void;
 }
 
 export const useStorageP2P  = create<DBStorage>()(
   persist(
-    (set, get) => ({
-      priorityQueueStorage: "",
-      lastUpdated: 0, 
-      preferredPeerId: null,
-      dateOfStorage: getFormattedDate(), 
+    (set, get) => ({ 
+      preferredPeerId: null, 
       
-      deviceId: "", 
-
+      deviceId: "",  
       connectedPeerId: null,
       connectedPeerName: "",
       isSearching: false,
       isConnected: false,
       isHub: false,
+      showChinese: false,
        
       setDeviceId: (id: string) => set({ deviceId: id }),
+      setShowChinese: (showChinese: boolean) => set({ showChinese: showChinese }),
 
       setConnectedPeerId: (id: string | null) => set({ connectedPeerId: id }),
       setConnectedPeerName: (name: string) => set({ connectedPeerName: name }),
@@ -56,30 +50,17 @@ export const useStorageP2P  = create<DBStorage>()(
       setIsConnected: (connected: boolean) => set({ isConnected: connected }),
       setIsSearching: (searching: boolean) => set({ isSearching: searching }),
 
-      updatePriorityQueueStorage: (incomingData: string) => {
-        set({
-          priorityQueueStorage: incomingData
-        });
-        return true;
-      },
       clearStorage: () => {
-        set({
-          priorityQueueStorage: "",
-          lastUpdated: 0,
-          preferredPeerId: null,
-          dateOfStorage: getFormattedDate(),
+        set({ 
+          preferredPeerId: null, 
+          deviceId: "", 
+          connectedPeerId: null,
+          connectedPeerName: "",
+          isSearching: false,
+          isConnected: false,
+          isHub: false,
         });  
-      },
-      clearStorageDaily: () => {
-        const currentDate = getFormattedDate();
-        const storedDate = get().dateOfStorage;
-        if (storedDate !== currentDate) {
-          get().clearStorage();
-        }
-        set({
-          dateOfStorage: currentDate
-        });
-      },
+      }, 
     }),
     {
       name: "fcfm-settings-storage",

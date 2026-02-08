@@ -1,5 +1,4 @@
-import type { ItemViewType } from "../../util/constants";
-import { LED } from "../LED"; 
+import type { ItemViewType } from "../../util/constants"; 
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -50,8 +49,7 @@ export function ItemController({
                     </TouchableOpacity>
                   </View>
                 ))}
-                <View style={[styles.cell, styles.center]}>
-                  <LED state={waiting ? "on" : "off"} pulse={waiting} />
+                <View style={[styles.cell, styles.center]}> 
                   <TouchableOpacity
                     style={[styles.warningButton, { marginTop: 8 }]}
                     onPress={() => onClickMarkWaiting(item.code)}

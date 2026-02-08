@@ -7,27 +7,6 @@ const NearbyStatusBadge = () => {
   const { connectedPeer, isSearching } = useNearbySync();
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
-  useEffect(() => {
-    if (isSearching) {
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(pulseAnim, {
-            toValue: 0.4,
-            duration: 1000,
-            useNativeDriver: true,
-          }),
-          Animated.timing(pulseAnim, {
-            toValue: 1,
-            duration: 1000,
-            useNativeDriver: true,
-          }),
-        ])
-      ).start();
-    } else {
-      pulseAnim.setValue(1);
-    }
-  }, [isSearching, pulseAnim]);
-
   const getStatusColor = () => {
     if (connectedPeer) return "#52c41a"; // Success green
     if (isSearching) return "#1890ff"; // Primary blue

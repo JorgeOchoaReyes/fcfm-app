@@ -17,8 +17,7 @@ export const useNearbySync = () => {
 
   const [discoveredPeers, setDiscoveredPeers] = useState<Nearby.BasePeer[]>([]);
 
-  const startP2P = useCallback(async () => {
-    // Note: Removed the isConnected guard here to allow re-broadcast if one side drops
+  const startP2P = useCallback(async () => { 
     setIsSearching(true);
     try {  
       await Nearby.stopDiscovery();
@@ -57,10 +56,8 @@ export const useNearbySync = () => {
     }
   }, [setIsConnected, setConnectedPeerId, setConnectedPeerName]);
 
-  useEffect(() => {
-    // 1. The Handshake Request
-    const inviteSub = Nearby.onInvitationReceived(async (event) => { 
-      // Only accept if it matches your specific logic
+  useEffect(() => { 
+    const inviteSub = Nearby.onInvitationReceived(async (event) => {  
       if (!preferredPeerId || event.peerId === preferredPeerId || ["BOH", "FOH"].includes(event.name)) {
         console.log("Accepting invitation from:", event.name);
         try {
@@ -70,8 +67,7 @@ export const useNearbySync = () => {
         }
       }  
     });
-
-    // 2. The Confirmation (The "Actually Connected" state)
+ 
     const connectSub = Nearby.onConnected((event) => {
       console.log(`✅ Connection established with ${event.name} (${event.peerId})`);
       alert(`✅ Connection established with ${event.name} (${event.peerId})`);
@@ -79,16 +75,6 @@ export const useNearbySync = () => {
       setConnectedPeerId(event.peerId);
       setConnectedPeerName(event.name);
       setIsSearching(false);  
-    });
-
-    // 3. THE MISSING PIECE: Listening for incoming sync data
-    const textSub = Nearby.onTextReceived((event) => {
-      console.log("📩 New Message Received:", event.text);
-      try {
-        alert(`Sync received from ${event.peerId} ${event.text}`);
-      } catch (e) {
-        console.error("Failed to parse incoming sync text", e);
-      }
     });
 
     const foundSub = Nearby.onPeerFound((event) => { 
@@ -119,8 +105,7 @@ export const useNearbySync = () => {
 
     return () => { 
       inviteSub();
-      connectSub();
-      textSub();
+      connectSub(); 
       foundSub();
       lostSub();
       disconnectSub();
@@ -129,33 +114,12 @@ export const useNearbySync = () => {
     };
   }, [startP2P, preferredPeerId, setConnectedPeerId, setConnectedPeerName, setIsConnected, setIsSearching]);
 
-  const syncData = async (targetId: string) => {
-    if (!targetId || !isConnected) {
-      console.warn("Attempted to sync while disconnected");
-      return;
-    }
-
-    const dataToSend = JSON.stringify({
-      head: "", // Populate these as needed
-      nodes: [],
-      lastUpdated: Date.now()
-    });
-
-    try {
-      await Nearby.sendText(targetId, dataToSend);
-      console.log("✈️ Data sent successfully to:", targetId);
-    } catch (e) {
-      console.error("Sync Send Error:", e);
-    }
-  };
-
   return { 
-    connectedPeer: isConnected ? preferredPeerId : null, // or use your state variable
+    connectedPeer: isConnected ? preferredPeerId : null, 
     isSearching, 
     discoveredPeers, 
     startP2P, 
     stopP2P, 
     disconnect, 
-    syncData 
   };
 };
