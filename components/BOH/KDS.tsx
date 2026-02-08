@@ -1,7 +1,7 @@
 import { useStorageP2P } from "hooks/useStorage";
 import { Item } from "../../types"; 
 import { Timer } from "../Timer";
-import { useState } from "react";
+import React, { useState, memo } from "react";
 import { View, TouchableOpacity, Text, FlatList, Switch }  from "react-native"; 
 
 const assignBgTheme = (item: Item): string => {
@@ -27,7 +27,7 @@ const assignBgTheme = (item: Item): string => {
 };
 
 
-const KDSItemView = ({
+const KDSItemView = memo(({
   item, 
   updateStatus,
   onRecall,
@@ -73,7 +73,7 @@ const KDSItemView = ({
       </Text></View> 
     </TouchableOpacity>
   );
-};
+});
 
 interface KDSProps {
   items: Item[];

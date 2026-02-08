@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, ActivityIndicator, SafeAreaView } from "react-native";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Nearby from "expo-nearby-connections";
 import { useStorageP2P } from "../hooks/useStorage";
@@ -8,14 +8,14 @@ import { usePriorityQueue } from "hooks/usePriority-Queue";
 
 export default function ConnectionPicker() {
   const { 
-    preferredPeerId, 
-    setPreferredPeer, 
-    deviceId, 
-    setDeviceId, 
     isHub, 
-    setIsHub, 
+    deviceId, 
+    preferredPeerId, 
     connectedPeerId, 
     connectedPeerName, 
+    setPreferredPeer, 
+    setDeviceId, 
+    setIsHub, 
     clearStorage 
   } = useStorageP2P();
   const { discoveredPeers, isSearching, startP2P, stopP2P, disconnect } = useNearbySync();

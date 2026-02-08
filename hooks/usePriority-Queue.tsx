@@ -13,6 +13,7 @@ interface PriorityQueueStorage {
     instanceTracker: { [key: string]: boolean };
     waitingTracker: { [key: string]: boolean };
   }; 
+  lastUpdated: number;
   date: string; 
   add: (value: Item) => void;
   listActive: () => Item[]; 
@@ -49,6 +50,7 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
         instanceTracker: {} as { [key: string]: boolean },
         waitingTracker: {} as { [key: string]: boolean },
       }, 
+      lastUpdated: Date.now(),
       date: getFormattedDate(), 
       add: (value: Item) => {
         const { pq } = get();
@@ -66,6 +68,7 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
             instanceTracker: { ...state.pq.instanceTracker, [value.code]: true }
           }
         }));
+        set({ lastUpdated: Date.now() });
       },
       listActive: () => {
         const { pq } = get();
@@ -99,10 +102,11 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
             return {
               pq: {
                 ...newPq,
-                history: [...newPq.history, historyItem],
+                history: [...newPq.history, historyItem].slice(-100),
               }
             };
           }
+          set({ lastUpdated: Date.now() });
           return state;
         });
       },
@@ -126,6 +130,7 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
           updatedTarget.completedAt = undefined; 
           
           const category = getCategory(updatedTarget);
+          const waiting = updatedTarget.waiting;
           return {
             pq: {
               ...state.pq,
@@ -133,10 +138,12 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
               inProgressItems: category === "in-progress" ? [...state.pq.inProgressItems, updatedTarget] : state.pq.inProgressItems,
               waitingItems: category === "waiting" ? [...state.pq.waitingItems, updatedTarget] : state.pq.waitingItems,
               pendingItems: category === "pending" ? [...state.pq.pendingItems, updatedTarget] : state.pq.pendingItems,
-              instanceTracker: { ...state.pq.instanceTracker, [target.code]: true }
+              instanceTracker: { ...state.pq.instanceTracker, [target.code]: true },
+              waitingTracker: { ...state.pq.waitingTracker, [target.code]: waiting },
             }
           };
         });
+        set({ lastUpdated: Date.now() });
       },
       markWaiting: (code: string) => {
         const { pq } = get();
@@ -162,6 +169,8 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
             );
           }
 
+          set({ lastUpdated: Date.now() });
+
           return {
             pq: {
               ...newPq,
@@ -176,6 +185,7 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
           
           if (newPq.pendingItems.some(i => i.code === code)) {
             const item = newPq.pendingItems.find(i => i.code === code)!;
+            set({ lastUpdated: Date.now() });
             return {
               pq: {
                 ...newPq,
@@ -189,11 +199,12 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
             const item = newPq.inProgressItems.find(i => i.code === code)!;
             const { [code]: _, ...remainingInstances } = newPq.instanceTracker;
             const { [code]: __, ...remainingWaiting } = newPq.waitingTracker;
+            set({ lastUpdated: Date.now() });
             return {
               pq: {
                 ...newPq,
                 inProgressItems: newPq.inProgressItems.filter(i => i.code !== code),
-                history: [...newPq.history, { ...item, status: "completed", completedAt: Date.now() }],
+                history: [...newPq.history, { ...item, status: "completed" as const, completedAt: Date.now() }].slice(-100),
                 instanceTracker: remainingInstances,
                 waitingTracker: remainingWaiting
               }
@@ -202,6 +213,7 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
 
           if (newPq.waitingItems.some(i => i.code === code)) {
             const item = newPq.waitingItems.find(i => i.code === code)!;
+            set({ lastUpdated: Date.now() });
             return {
               pq: {
                 ...newPq,
@@ -221,6 +233,7 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
                pq.waitingItems.find((i) => i.name === name) || null;
       },
       clearPriorityQueue: () => {
+        set({ lastUpdated: Date.now() });
         set({
           pq: {
             inProgressItems: [],
@@ -238,6 +251,8 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
           alert(!pq.instanceTracker[code] ? "Item not in queue!" : "Item is not waiting!");
           return;
         }
+
+        set({ lastUpdated: Date.now() });
 
         set((state) => {
           const newPq = { ...state.pq };
@@ -279,6 +294,7 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
           } 
 
           if (target) {
+            set({ lastUpdated: Date.now() });
             const updatedTarget = { ...target, batchSize };
             const category = getCategory(updatedTarget);
             return {
