@@ -1,8 +1,8 @@
-import { Item } from "../../types";
-import { Ionicons } from "@expo/vector-icons";
+import { useStorageP2P } from "hooks/useStorage";
+import { Item } from "../../types"; 
 import { Timer } from "../Timer";
 import { useState } from "react";
-import { View, TouchableOpacity, Text, FlatList }  from "react-native"; 
+import { View, TouchableOpacity, Text, FlatList, Switch }  from "react-native"; 
 
 const assignBgTheme = (item: Item): string => {
   let theme = "";
@@ -28,16 +28,17 @@ const assignBgTheme = (item: Item): string => {
 
 
 const KDSItemView = ({
-  item,
-  onDelete,
+  item, 
   updateStatus,
   onRecall,
   itemCompleted = false,
+  showChinese,
 }: {
   item: Item;
   onDelete: (name: string) => void;
   updateStatus: (code: string, status?: "pending" | "in-progress" | "completed") => void;
   itemCompleted: boolean;
+  showChinese: boolean;
   onRecall: (id: number) => void;
 }) => {
   const active = (item.status === "in-progress" || item.waiting);
@@ -55,27 +56,21 @@ const KDSItemView = ({
         }
       }}
     >
-      <View className="flex-[4] font-semibold"><Text className="text-md" numberOfLines={1}>{item.name}</Text></View>
-      <View className="flex-[1] items-center"><Text className="text-md">#{item.batchSize}</Text></View>
-      <View className="flex-[2] items-center">
+      <View className="flex-[4] font-semibold"><Text className="text-xl font-bold" numberOfLines={1}>{showChinese ? item.chineseName : item.name}</Text></View>
+      <View className="flex-[1] items-center"><Text className="text-xl font-bold">#{item.batchSize}</Text></View>
+      <View className="flex-[2] items-center">  
         {
-          completed ? <Text className="text-md text-slate-400">--:--</Text> : <Timer 
-            textSize="text-md"
+          completed ? <Text className="text-xl font-bold text-slate-400">--:--</Text> : <Timer 
+            textSize="text-xl"
             textColor={active ? "text-white" : "text-black"} 
             startTimestamp={item.createdAt} 
           />
         }
       </View>
-      <View className="flex-[1] items-center"><Text className="text-md">{item.waiting ? "⚠️" : " "}</Text></View>
-      <View className="flex-[2] items-center"><Text className="text-md capitalize">
+      <View className="flex-[1] items-center"><Text className="text-xls font-bold">{item.waiting ? "⚠️" : " "}</Text></View>
+      <View className="flex-[2] items-center"><Text className="text-xl font-bold capitalize">
         {item.status === "in-progress" ? "cooking" : item.status}
-      </Text></View>
-      {/* <TouchableOpacity onPress={() => { 
-        if (completed) return;
-        onDelete(item.code);
-      }} className="flex-[1] items-center text-black">
-        <Ionicons name="trash" size={24} color="black" />
-      </TouchableOpacity> */}
+      </Text></View> 
     </TouchableOpacity>
   );
 };
@@ -96,10 +91,19 @@ export const KDS = ({
   onRecall,
 }: KDSProps) => {
   const [showHistory, setShowHistory] = useState(false);
+  const { showChinese, setShowChinese } = useStorageP2P();
+  
   return (
     <View className="rounded-2x p-6 overflow-auto w-full">
       <View className="flex flex-row items-center mb-4">
         <Text className="text-2xl font-bold flex-1">{showHistory ? "History" : "Items"}</Text>
+        <View className="flex flex-row items-center">
+          <Text>Chinese</Text>
+          <Switch 
+            value={showChinese}
+            onValueChange={setShowChinese}
+          />
+        </View>
         <TouchableOpacity
           onPress={() => setShowHistory(!showHistory)}
           delayPressIn={0} 
@@ -124,6 +128,7 @@ export const KDS = ({
           <KDSItemView
             key={item.id}
             item={item}
+            showChinese={showChinese}
             onDelete={onDelete}
             updateStatus={onUpdateStatus}
             itemCompleted={item.status === "completed" || item.status === "deleted"}

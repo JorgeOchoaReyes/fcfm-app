@@ -11,6 +11,7 @@ export default function Home() {
     add,
     markWaiting,
     unmarkWaiting,
+    updateBatchSize,
     pq
   } = usePriorityQueue(); 
 
@@ -25,8 +26,18 @@ export default function Home() {
           renderItem={({ item }) => { 
             return <BOHItem
               key={item.code}
-              item={item}
-              onClickAdd={(batch: number) => {
+              item={item} 
+              onClickAdd={(batch: number) => { 
+                let target = null;
+                if(pq.pendingItems.find(i => i.code === item.code)){
+                  target = pq.pendingItems.find(i => i.code === item.code);
+                }else if(pq.waitingItems.find(i => i.code === item.code)){
+                  target = pq.waitingItems.find(i => i.code === item.code);
+                }
+                if(target){
+                  updateBatchSize(item.code, batch);
+                  return;
+                }
                 add({
                   id: Date.now(),
                   name: item.name,
@@ -34,7 +45,8 @@ export default function Home() {
                   waiting: false,
                   status: "pending",
                   createdAt: Date.now(),
-                  code: item.code
+                  code: item.code,
+                  chineseName: item.chineseName
                 });
               }} 
             />;

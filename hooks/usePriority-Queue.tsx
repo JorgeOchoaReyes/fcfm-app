@@ -25,6 +25,7 @@ interface PriorityQueueStorage {
   updateStatus: (code: string) => void;
   clearPriorityQueue: () => void;
   unmarkWaiting: (code: string) => void;
+  updateBatchSize: (code: string, batchSize: number) => void;
 }
 
 const getCategory = (item: Item) => {
@@ -46,7 +47,7 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
         pendingItems: [],
         history: [],
         instanceTracker: {} as { [key: string]: boolean },
-        waitingTracker: {} as { [key: string]: boolean }
+        waitingTracker: {} as { [key: string]: boolean },
       }, 
       date: getFormattedDate(), 
       add: (value: Item) => {
@@ -254,6 +255,39 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
                 ...newPq,
                 waitingItems: newPq.waitingItems,
                 waitingTracker: remainingWaiting
+              }
+            };
+          }
+
+          return state;
+        });
+      },
+      updateBatchSize: (code: string, batchSize: number) => {
+        set((state) => {
+          const newPq = { ...state.pq };
+          let target: Item | undefined;
+
+          if (newPq.pendingItems.some(i => i.code === code)) {
+            target = newPq.pendingItems.find(i => i.code === code)!; 
+            newPq.pendingItems = newPq.pendingItems.filter(i => i.code !== code);
+          } else if (newPq.waitingItems.some(i => i.code === code)) {
+            target = newPq.waitingItems.find(i => i.code === code)!;
+            newPq.waitingItems = newPq.waitingItems.filter(i => i.code !== code);
+          } else if (newPq.inProgressItems.some(i => i.code === code)) {
+            alert("Item is in progress!");
+            return state;
+          } 
+
+          if (target) {
+            const updatedTarget = { ...target, batchSize };
+            const category = getCategory(updatedTarget);
+            return {
+              pq: {
+                ...newPq,
+                inProgressItems: category === "in-progress" ? [...newPq.inProgressItems, updatedTarget] : newPq.inProgressItems,
+                waitingItems: category === "waiting" ? [...newPq.waitingItems, updatedTarget] : newPq.waitingItems,
+                pendingItems: category === "pending" ? [...newPq.pendingItems, updatedTarget] : newPq.pendingItems,
+                instanceTracker: { ...newPq.instanceTracker, [target.code]: true }
               }
             };
           }

@@ -10,6 +10,7 @@ export interface Item {
   name: string;
   code: string;
   batchSize: number;
+  chineseName: string;
 
   waiting: boolean;
   status: "pending" | "waiting" | "in-progress" | "completed" | "deleted";
