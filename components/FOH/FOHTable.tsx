@@ -1,6 +1,7 @@
+import React, { memo , useState } from "react";
 import { Item } from "../../types"; 
 import { Timer } from "../Timer";
-import { useState } from "react";
+
 import { View, TouchableOpacity, Text, FlatList }  from "react-native"; 
 
 const assignBgTheme = (item: Item): string => {
@@ -25,8 +26,7 @@ const assignBgTheme = (item: Item): string => {
   return theme;
 };
 
-
-const KDSItemView = ({
+const KDSItemView = memo(({
   item,
   itemCompleted = false,
   onPress,
@@ -47,8 +47,8 @@ const KDSItemView = ({
       }
       className={`flex flex-row items-center p-2 m-1 rounded-xl ${completed ? "bg-slate-200 text-black" : assignBgTheme(item)}`}
     >
-      <View className="flex-[4] font-semibold"><Text className="text-xl" numberOfLines={1}>{item.name}</Text></View>
-      <View className="flex-[1] items-center"><Text className="text-xl">#{item.batchSize}</Text></View>
+      <View className="flex-[1] items-center font-bold"><Text className="text-xl font-bold" numberOfLines={1}>{item.code}</Text></View>
+      <View className="flex-[2] items-center"><Text className="text-xl">#{item.batchSize}</Text></View>
       <View className="flex-[2] items-center">
         {
           completed ? <Text className="text-xl text-slate-400">--:--</Text> : <Timer 
@@ -62,7 +62,7 @@ const KDSItemView = ({
       <View className="flex-[2] items-center"><Text className="text-lg capitalize">{item.status}</Text></View>
     </TouchableOpacity>
   );
-};
+});
 
 interface FOHTableViewProps {
   items: Item[];

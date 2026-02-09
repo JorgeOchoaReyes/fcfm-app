@@ -1,7 +1,7 @@
 import { useStorageP2P } from "hooks/useStorage";
 import { Item } from "../../types"; 
 import { Timer } from "../Timer";
-import { useState } from "react";
+import React, { useState, memo } from "react";
 import { View, TouchableOpacity, Text, FlatList, Switch }  from "react-native"; 
 
 const assignBgTheme = (item: Item): string => {
@@ -27,7 +27,7 @@ const assignBgTheme = (item: Item): string => {
 };
 
 
-const KDSItemView = ({
+const KDSItemView = memo(({
   item, 
   updateStatus,
   onRecall,
@@ -46,7 +46,7 @@ const KDSItemView = ({
 
   return (
     <TouchableOpacity
-      className={`flex flex-row items-center m-1 p-2 rounded-xl border border-slate-500 ${completed ? "bg-slate-200 text-black" : assignBgTheme(item)}`}
+      className={`flex flex-row p-2 items-center rounded-xl border border-slate-500 ${completed ? "bg-slate-200 text-black" : assignBgTheme(item)}`}
       delayPressIn={0} 
       onPress={() => {
         if (completed) {
@@ -73,7 +73,7 @@ const KDSItemView = ({
       </Text></View> 
     </TouchableOpacity>
   );
-};
+});
 
 interface KDSProps {
   items: Item[];
@@ -124,6 +124,9 @@ export const KDS = ({
         keyExtractor={(item) => item.code + item.id}
         scrollEnabled
         numColumns={1}
+        contentContainerStyle={{
+          gap: 5,
+        }}
         renderItem={({ item }) => (
           <KDSItemView
             key={item.id}

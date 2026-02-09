@@ -1,28 +1,16 @@
-import React, { useEffect, useRef } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Animated } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useNearbySync } from "../hooks/useNearbySync";
+import React from "react";
+import { View, TouchableOpacity, StyleSheet, Animated } from "react-native";
+import { Ionicons } from "@expo/vector-icons"; 
+import { useStorageP2P } from "hooks/useStorage";
 
 const NearbyStatusBadge = () => {
-  const { connectedPeer, isSearching } = useNearbySync();
-  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const { connectedPeerId, isSearching } = useStorageP2P(); 
 
   const getStatusColor = () => {
-    if (connectedPeer) return "#52c41a"; // Success green
+    if (connectedPeerId) return "#52c41a"; // Success green
     if (isSearching) return "#1890ff"; // Primary blue
     return "#ff4d4f"; // Error red
-  };
-
-  const getStatusText = () => {
-    if (connectedPeer) return "Connected";
-    if (isSearching) return "Searching...";
-    return "Disconnected";
-  };
-
-  const getHealthStatus = () => {
-    if (connectedPeer) return "Healthy";
-    return "Unknown";
-  };
+  }; 
 
   return (
     <View style={styles.container}>
@@ -34,15 +22,9 @@ const NearbyStatusBadge = () => {
           <Animated.View 
             style={[
               styles.dot, 
-              { backgroundColor: getStatusColor(), opacity: pulseAnim }
+              { backgroundColor: getStatusColor()}
             ]} 
-          />
-          <View>
-            <Text style={styles.statusText}>{getStatusText()}</Text>
-            {connectedPeer && (
-              <Text style={styles.healthText}>{getHealthStatus()}</Text>
-            )}
-          </View>
+          /> 
           <Ionicons 
             name="refresh-circle" 
             size={20} 

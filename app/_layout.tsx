@@ -6,6 +6,7 @@ import NearbyStatusBadge from "../components/NearbyStatusBadge";
 import { useStorageP2P } from "../hooks/useStorage";
 import * as Nearby from "expo-nearby-connections";
 import { usePriorityQueue } from "../hooks/usePriority-Queue";
+import { useStoreSync } from "../hooks/useSyncHook";
 
 const requestLocationNeabyDevicesPermission = async () => {
   try {
@@ -35,14 +36,15 @@ const requestLocationNeabyDevicesPermission = async () => {
 export default function RootLayout() {
   const router = useRouter();
   const pathname = usePathname();
-  const {  
-    preferredPeerId, 
-    setConnectedPeerId, 
-    setConnectedPeerName, 
-    setIsConnected, 
-    connectedPeerId 
-  } = useStorageP2P();
+  const setConnectedPeerId = useStorageP2P(state => state.setConnectedPeerId);
+  const setConnectedPeerName = useStorageP2P(state => state.setConnectedPeerName);
+  const setIsConnected = useStorageP2P(state => state.setIsConnected);
+  const connectedPeerId = useStorageP2P(state => state.connectedPeerId);
+  
   const { clearPriorityQueue } = usePriorityQueue(); 
+
+  useStoreSync(connectedPeerId);
+
   const returnFunctiton = () => {
     router.navigate("/");
   };
@@ -51,20 +53,13 @@ export default function RootLayout() {
     requestLocationNeabyDevicesPermission(); 
   }, []);
 
-  useEffect(() => {  
-    const intervalId = setInterval(() => { 
-    }, 30 * 60 * 1000 );
-    return () => clearInterval(intervalId);
-  }, []);
-
   useEffect(() => {
     const inviteSub = Nearby.onInvitationReceived(async (event) => {  
-      if (!preferredPeerId || event.peerId === preferredPeerId || ["BOH", "FOH"].includes(event.name)) {
-        console.log("Accepting invitation from:", event.name);
+      if (["BOH", "FOH"].includes(event.name)) { 
         try {
           await Nearby.acceptConnection(event.peerId); 
         } catch (e) {
-          alert("Error accepting connection: " + e);
+          console.error("Error accepting connection at _layout:", e);
         }
       }  
     });
@@ -73,27 +68,13 @@ export default function RootLayout() {
       setIsConnected(false);
       setConnectedPeerId(null);
       setConnectedPeerName("");
-      alert("Disconnected");
-    });   
- 
-    const textSub = Nearby.onTextReceived((event) => {
-      console.log("📩 New Message Received:", event.text);
-      try {
-        const data = JSON.parse(event.text); 
-        alert(`Sync received from ${event.peerId}`);
-      } catch (e) {
-        console.error("Failed to parse incoming sync text", e);
-      }
-    });
+    });    
 
     return () => {  
       disconnectSub();
-      inviteSub();
-      textSub();
-      Nearby.stopDiscovery();
-      Nearby.stopAdvertise();
+      inviteSub(); 
     };
-  }, [preferredPeerId, connectedPeerId]);
+  }, [setIsConnected, setConnectedPeerId, setConnectedPeerName]);
   
 
   return <>

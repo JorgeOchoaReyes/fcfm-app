@@ -1,45 +1,76 @@
-import React, { useState } from "react";
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, ActivityIndicator, SafeAreaView } from "react-native";
+import React, { useState, useCallback } from "react";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Nearby from "expo-nearby-connections";
 import { useStorageP2P } from "../hooks/useStorage";
 import { useNearbySync } from "../hooks/useNearbySync";
 import { usePriorityQueue } from "hooks/usePriority-Queue";
+import { useShallow } from "zustand/react/shallow";
 
 export default function ConnectionPicker() {
   const { 
-    preferredPeerId, 
-    setPreferredPeer, 
-    deviceId, 
-    setDeviceId, 
     isHub, 
-    setIsHub, 
+    deviceId,  
     connectedPeerId, 
-    connectedPeerName, 
+    connectedPeerName,  
+    setDeviceId, 
+    setIsHub, 
     clearStorage 
-  } = useStorageP2P();
+  } = useStorageP2P(useShallow(state => ({
+    isHub: state.isHub,
+    deviceId: state.deviceId,
+    connectedPeerId: state.connectedPeerId,
+    connectedPeerName: state.connectedPeerName,
+    setDeviceId: state.setDeviceId,
+    setIsHub: state.setIsHub,
+    clearStorage: state.clearStorage
+  })));
+
   const { discoveredPeers, isSearching, startP2P, stopP2P, disconnect } = useNearbySync();
-  const { clearPriorityQueue } = usePriorityQueue();
+  const clearPriorityQueue = usePriorityQueue(state => state.clearPriorityQueue);
+  
   const [isEditingId, setIsEditingId] = useState(false);
   const [tempDeviceId, setTempDeviceId] = useState(deviceId);
-
-  const togglePermanent = async (id: string) => {
-    if (preferredPeerId === id) {
-      setPreferredPeer(null);
-    } else {
-      setPreferredPeer(id);
-      await Nearby.acceptConnection(id);
-    }
-  };
-
-  const handleSaveDeviceId = () => {
+ 
+  const handleSaveDeviceId = useCallback(() => {
     setDeviceId(tempDeviceId);
     setIsEditingId(false);
-    startP2P(); // Restart to broadcast new ID
-  };
+    startP2P(); 
+  }, [setDeviceId, tempDeviceId, startP2P]);
 
-  const renderPeerItem = ({ item }: { item: Nearby.BasePeer }) => {
-    const isPreferred = preferredPeerId === item.peerId;
+  const handleDisconnect = useCallback((peerId: string) => {
+    disconnect(peerId);
+  }, [disconnect]);
+
+  const handleStartP2P = useCallback(() => {
+    startP2P();
+  }, [startP2P]);
+
+  const handleStopP2P = useCallback(() => {
+    stopP2P();
+  }, [stopP2P]);
+
+  const handleMakeHub = useCallback(() => {
+    setIsHub(true);
+  }, [setIsHub]);
+
+  const handleMakeClient = useCallback(() => {
+    setIsHub(false);
+  }, [setIsHub]);
+
+  const handleClearP2P = useCallback(() => {
+    clearStorage();
+  }, [clearStorage]);
+
+  const handleClearPQ = useCallback(() => {
+    clearPriorityQueue();
+  }, [clearPriorityQueue]);
+
+  const handleRequestConnection = useCallback(async (peerId: string) => {
+    await Nearby.requestConnection(peerId);
+  }, []);
+
+  const renderPeerItem = useCallback(({ item }: { item: Nearby.BasePeer }) => { 
     const isCurrentConnected = connectedPeerId === item.peerId;
 
     return (
@@ -55,17 +86,7 @@ export default function ConnectionPicker() {
           <View style={styles.peerInfo}>
             <Text style={[styles.peerName, isCurrentConnected && styles.whiteText]}>{item.name}</Text>
             <Text style={[styles.peerId, isCurrentConnected && styles.lightText]}>{item.peerId}</Text>
-          </View>
-          <TouchableOpacity 
-            onPress={() => togglePermanent(item.peerId)}
-            style={styles.starButton}
-          >
-            <Ionicons 
-              name={isPreferred ? "star" : "star-outline"} 
-              size={24} 
-              color={isPreferred ? "#FFD700" : (isCurrentConnected ? "#ddd" : "#ccc")} 
-            />
-          </TouchableOpacity>
+          </View> 
         </View>
 
         <View style={styles.cardActions}>
@@ -77,7 +98,7 @@ export default function ConnectionPicker() {
               </View>
               <TouchableOpacity 
                 style={styles.disconnectButton} 
-                onPress={() => disconnect(item.peerId)}
+                onPress={() => handleDisconnect(item.peerId)}
               >
                 <Ionicons name="close-circle-outline" size={20} color="#fff" />
                 <Text style={styles.disconnectButtonText}>Disconnect</Text>
@@ -86,7 +107,7 @@ export default function ConnectionPicker() {
           ) : (
             <TouchableOpacity 
               style={styles.connectButton} 
-              onPress={async () => await Nearby.requestConnection(item.peerId)}
+              onPress={() => handleRequestConnection(item.peerId)}
             >
               <Text style={styles.connectButtonText}>Connect Now</Text>
               <Ionicons name="arrow-forward" size={16} color="#fff" />
@@ -95,7 +116,7 @@ export default function ConnectionPicker() {
         </View>
       </View>
     );
-  };
+  }, [connectedPeerId, handleDisconnect, handleRequestConnection]);
 
   return (
     <View style={styles.container}>
@@ -104,7 +125,7 @@ export default function ConnectionPicker() {
           <Text style={styles.headerSubtitle}>FCFM Network</Text>
           <Text style={styles.headerTitle}>Connections</Text>
         </View>
-        <TouchableOpacity style={styles.refreshCircle} onPress={startP2P} disabled={isSearching}>
+        <TouchableOpacity style={styles.refreshCircle} onPress={handleStartP2P} disabled={isSearching}>
           {isSearching ? (
             <ActivityIndicator size="small" color="#4A90E2" />
           ) : (
@@ -113,86 +134,83 @@ export default function ConnectionPicker() {
         </TouchableOpacity>
       </View>
  
-      <View style={{
-        flexDirection: "row", 
-        alignItems: "center",
-        marginBottom: 10,
-        justifyContent: "flex-end",
-        marginRight: 10,
-      }}>
-        <TouchableOpacity style={{
-          backgroundColor: "#4A90E2",
-          padding: 10,
-          borderRadius: 10, 
+      <View style={{flexDirection: "row-reverse", justifyContent: "space-around", alignItems: "center"}} > 
+        <View style={{
+          flexDirection: "row", 
+          alignItems: "center",
+          marginBottom: 10,
+          justifyContent: "flex-end",
           marginRight: 10,
-          alignItems: "center",
-        }} onPress={() => {
-          clearStorage();
         }}>
-          <Text style={{...styles.sectionTitle, color: "white"}}>Clear P2P Storage</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={{
-          backgroundColor: "#4A90E2",
-          padding: 10,
-          borderRadius: 10, 
-          alignItems: "center",
-          marginRight: 10,
-        }} onPress={() => {
-          clearPriorityQueue();
-        }}>
-          <Text style={{...styles.sectionTitle, color: "white"}}>Clear PQ Storage</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={{
-          backgroundColor: "#4A90E2",
-          padding: 10,
-          borderRadius: 10, 
-          alignItems: "center",
-        }} onPress={async () => {
-          alert("Sending test message to " + connectedPeerId);
-          try{
-            await Nearby.sendText(connectedPeerId || "", "This a test message!");
-          }catch(e){
-            alert("Error sending message: " + e);
-          }
-        }}>
-          <Text style={{...styles.sectionTitle, color: "white"}}>Test Send Payload</Text>
-        </TouchableOpacity>
-      </View> 
-
-      <View>  
-        <Text style={{textAlign: "center", fontSize: 20, fontWeight: "bold"}}> 
-          Status: {isHub ? "Hub" : "Client"}
-        </Text>
-        <View style={{flexDirection: "row", alignItems: "center", justifyContent: "center"}}> 
           <TouchableOpacity style={{
             backgroundColor: "#4A90E2",
             padding: 10,
             borderRadius: 10, 
             marginRight: 10,
             alignItems: "center",
-          }} onPress={() => {
-            setIsHub(true);
-          }}>
-            <Text style={{...styles.sectionTitle, color: "white"}}>Make Hub</Text>
-          </TouchableOpacity> 
-          <TouchableOpacity style={{
-            backgroundColor: "#4A90E2",
-            padding: 10,
-            borderRadius: 10, 
-            marginRight: 10,
-            alignItems: "center",
-          }} onPress={() => {
-            setIsHub(false);
-          }}>
-            <Text style={{...styles.sectionTitle, color: "white"}}>Make Client</Text>
+          }} onPress={handleClearP2P}>
+            <Text style={{...styles.sectionTitle, color: "white"}}>Clear P2P Storage</Text>
           </TouchableOpacity>
+          <TouchableOpacity style={{
+            backgroundColor: "#4A90E2",
+            padding: 10,
+            borderRadius: 10, 
+            alignItems: "center",
+            marginRight: 10,
+          }} onPress={handleClearPQ}>
+            <Text style={{...styles.sectionTitle, color: "white"}}>Clear PQ Storage</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={{
+            backgroundColor: "#4A90E2",
+            padding: 10,
+            borderRadius: 10, 
+            alignItems: "center",
+          }} onPress={async () => {
+            if (!connectedPeerId) {
+              alert("Connect to a peer first");
+              return;
+            }
+            try{
+              await Nearby.sendText(connectedPeerId, "This a test message!");
+            }catch(e){
+              alert("Error sending message: " + e);
+            }
+          }}>
+            <Text style={{...styles.sectionTitle, color: "white"}}>Test Send Payload</Text>
+          </TouchableOpacity>
+        </View> 
+
+        <View>  
+          <Text style={{textAlign: "center", fontSize: 20, fontWeight: "bold"}}> 
+          Status: {isHub ? "Hub" : "Client"}
+          </Text>
+          <View style={{flexDirection: "row", alignItems: "center", justifyContent: "center"}}> 
+            <TouchableOpacity style={{
+              backgroundColor: "#4A90E2",
+              padding: 10,
+              borderRadius: 10, 
+              marginRight: 10,
+              alignItems: "center",
+            }} onPress={handleMakeHub}>
+              <Text style={{...styles.sectionTitle, color: "white"}}>Make Hub</Text>
+            </TouchableOpacity> 
+            <TouchableOpacity style={{
+              backgroundColor: "#4A90E2",
+              padding: 10,
+              borderRadius: 10, 
+              marginRight: 10,
+              alignItems: "center",
+            }} onPress={handleMakeClient}>
+              <Text style={{...styles.sectionTitle, color: "white"}}>Make Client</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 
       <View style={styles.myDeviceSection}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>My Identity</Text>
-          <TouchableOpacity onPress={() => setIsEditingId(!isEditingId)}>
+          <TouchableOpacity onPress={() => setIsEditingId(prev => !prev)}>
             <Text style={styles.editAction}>{isEditingId ? "Cancel" : "Edit"}</Text>
           </TouchableOpacity>
         </View>
@@ -220,7 +238,7 @@ export default function ConnectionPicker() {
             <View style={styles.idActions}>
               <View style={[styles.pulse, isSearching && styles.pulseActive]} />
               {isSearching && (
-                <TouchableOpacity style={styles.stopButton} onPress={stopP2P}>
+                <TouchableOpacity style={styles.stopButton} onPress={handleStopP2P}>
                   <Ionicons name="stop-circle-outline" size={24} color="#ff4d4f" />
                 </TouchableOpacity>
               )}
@@ -228,7 +246,7 @@ export default function ConnectionPicker() {
           </View>
         )}
       </View>
-
+  
       <View style={styles.listSection}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>
@@ -256,7 +274,7 @@ export default function ConnectionPicker() {
                 {isSearching ? "Looking for nearby devices..." : "No devices found nearby."}
               </Text>
               {!isSearching && (
-                <TouchableOpacity style={styles.retryButton} onPress={startP2P}>
+                <TouchableOpacity style={styles.retryButton} onPress={handleStartP2P}>
                   <Text style={styles.retryButtonText}>Scan Again</Text>
                 </TouchableOpacity>
               )}

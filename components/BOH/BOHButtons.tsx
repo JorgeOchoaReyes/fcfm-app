@@ -1,23 +1,28 @@
+import React from "react";
 import type { ItemViewType } from "../../util/constants";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native"; 
+import { useStorageP2P } from "hooks/useStorage";
 
 export interface ItemControllerProps {
   id?: string;
   children?: React.ReactNode;
   item: ItemViewType;
+  isFoh: boolean;
   onClickAdd: (batch: number) => void;
 }
 
-export function BOHItem({
+export const BOHItem = React.memo(({
   item, 
   onClickAdd, 
-}: ItemControllerProps) {
+  isFoh
+}: ItemControllerProps) => {
+  const { showChinese } = useStorageP2P();
   return (
     <View className={"w-[200px] mx-auto my-1"}>
       <View className="bg-red-500  rounded-2xl shadow-lg overflow-hidden">
         <View className="px-4 flex items-center py-2 text-center relative">
           <View className="flex flex-row justify-between items-center"> 
-            <Text className="text-white text-lg font-bold">{item.name}</Text> 
+            <Text className="text-white text-lg font-bold">{(showChinese && !isFoh) ? item.chineseName : item.name}</Text> 
           </View>  
         </View>
         <View className="">
@@ -46,7 +51,7 @@ export function BOHItem({
       </View>
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   table: {

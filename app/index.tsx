@@ -11,19 +11,19 @@ export default function App() {
       <SafeAreaView style={styles.container}>    
         <TouchableOpacity 
           delayPressIn={0} 
-          onPress={() => router.push("/kds")} 
+          onPress={() => router.navigate("/kds")} 
           style={styles.bigButtonBOH}>
           <Text style={styles.buttonText}>BOH</Text>
         </TouchableOpacity>
         <TouchableOpacity 
           delayPressIn={0} 
-          onPress={() => router.push("/stc")} 
+          onPress={() => router.navigate("/stc")} 
           style={styles.bigButtonFOH}>
           <Text style={styles.buttonText}>FOH</Text>
         </TouchableOpacity>
         <TouchableOpacity 
           delayPressIn={0} 
-          onPress={() => router.push("/settings")} 
+          onPress={() => router.navigate("/settings")} 
           style={styles.bigButtonSettings}>
           <Text style={styles.buttonText}>Settings</Text>
         </TouchableOpacity>
