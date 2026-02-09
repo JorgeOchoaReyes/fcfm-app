@@ -85,7 +85,7 @@ export const useNearbySync = () => {
     const textSub = Nearby.onTextReceived((event) => {
       console.log("📩 New Message Received:", event.text);
       try {
-        alert(`Sync received from ${event.peerId} ${event.text}`);
+        
       } catch (e) {
         console.error("Failed to parse incoming sync text", e);
       }

@@ -46,7 +46,7 @@ const KDSItemView = memo(({
 
   return (
     <TouchableOpacity
-      className={`flex flex-row items-center m-1 p-2 rounded-xl border border-slate-500 ${completed ? "bg-slate-200 text-black" : assignBgTheme(item)}`}
+      className={`flex flex-row p-2 items-center rounded-xl border border-slate-500 ${completed ? "bg-slate-200 text-black" : assignBgTheme(item)}`}
       delayPressIn={0} 
       onPress={() => {
         if (completed) {
@@ -124,6 +124,9 @@ export const KDS = ({
         keyExtractor={(item) => item.code + item.id}
         scrollEnabled
         numColumns={1}
+        contentContainerStyle={{
+          gap: 5,
+        }}
         renderItem={({ item }) => (
           <KDSItemView
             key={item.id}

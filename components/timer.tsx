@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, memo } from "react";
 import { Text, View } from "react-native";
 
 interface ElapsedTimerProps {
@@ -9,13 +9,13 @@ interface ElapsedTimerProps {
   textSize?: string
 }
 
-export function Timer({ 
+export const Timer = memo(({ 
   startTimestamp,
   title = "Elapsed Time",
   description,
   textColor = "text-black",
   textSize = "text-md"
-}: ElapsedTimerProps) {
+}: ElapsedTimerProps) => {
   const [elapsedTime, setElapsedTime] = useState("");
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export function Timer({
       const elapsed = now - startTimestamp;
 
       if (elapsed < 0) {
-        setElapsedTime("Timer not started yet");
+        setElapsedTime(prev => prev === "Timer not started yet" ? prev : "Timer not started yet");
         return;
       }
 
@@ -39,7 +39,8 @@ export function Timer({
       if (minutes > 0 || hours > 0 || days > 0) parts.push(`${minutes.toString().padStart(2, "0")}m`);
       parts.push(`${seconds.toString().padStart(2, "0")}s`);
 
-      setElapsedTime(parts.join(" "));
+      const newTime = parts.join(" ");
+      setElapsedTime(prev => prev === newTime ? prev : newTime);
     };
 
     updateElapsedTime();
@@ -53,4 +54,4 @@ export function Timer({
       <Text className={textSize}>{elapsedTime}</Text>
     </View>
   );
-}
+});

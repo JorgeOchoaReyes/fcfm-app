@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { usePriorityQueue } from "./usePriority-Queue";
-import * as Nearby from "expo-nearby-connections";
-import { useStore } from "zustand";
+import * as Nearby from "expo-nearby-connections"; 
 
 export const useStoreSync = (connectedPeerId: string | null) => {
   const isInternalUpdate = useRef(false);
@@ -15,8 +14,6 @@ export const useStoreSync = (connectedPeerId: string | null) => {
         return;
       }
 
-      alert("Syncing state to " + connectedPeerId);
-
       await Nearby.sendText(connectedPeerId, JSON.stringify({
         type: "SYNC_STATE",
         state: state
@@ -24,8 +21,7 @@ export const useStoreSync = (connectedPeerId: string | null) => {
     });
  
     const unsubscribeNearby = Nearby.onTextReceived((event) => {
-      try {
-        alert("Sync received from " + event.peerId);
+      try { 
         const payload = JSON.parse(event.text);
         if (payload.type === "SYNC_STATE") {
           const remoteState = payload.state;

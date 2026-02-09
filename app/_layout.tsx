@@ -36,12 +36,11 @@ const requestLocationNeabyDevicesPermission = async () => {
 export default function RootLayout() {
   const router = useRouter();
   const pathname = usePathname();
-  const {   
-    setConnectedPeerId, 
-    setConnectedPeerName, 
-    setIsConnected, 
-    connectedPeerId 
-  } = useStorageP2P();
+  const setConnectedPeerId = useStorageP2P(state => state.setConnectedPeerId);
+  const setConnectedPeerName = useStorageP2P(state => state.setConnectedPeerName);
+  const setIsConnected = useStorageP2P(state => state.setIsConnected);
+  const connectedPeerId = useStorageP2P(state => state.connectedPeerId);
+  
   const { clearPriorityQueue } = usePriorityQueue(); 
 
   useStoreSync(connectedPeerId);
@@ -54,20 +53,13 @@ export default function RootLayout() {
     requestLocationNeabyDevicesPermission(); 
   }, []);
 
-  useEffect(() => {  
-    // const intervalId = setInterval(() => { 
-
-    // }, 30 * 60 * 1000 );
-    // return () => clearInterval(intervalId);
-  }, []);
-
   useEffect(() => {
     const inviteSub = Nearby.onInvitationReceived(async (event) => {  
       if (["BOH", "FOH"].includes(event.name)) { 
         try {
           await Nearby.acceptConnection(event.peerId); 
         } catch (e) {
-          alert("Error accepting connection at _layout: " + e);
+          console.error("Error accepting connection at _layout:", e);
         }
       }  
     });
@@ -76,27 +68,13 @@ export default function RootLayout() {
       setIsConnected(false);
       setConnectedPeerId(null);
       setConnectedPeerName("");
-      alert("Disconnected at _layout");
-    });   
- 
-    // const textSub = Nearby.onTextReceived((event) => {
-    //   console.log("📩 New Message Received:", event.text);
-    //   try {
-    //     const data = JSON.parse(event.text); 
-    //     alert(`Sync received from ${event.peerId}`);
-    //   } catch (e) {
-    //     console.error("Failed to parse incoming sync text at _layout", e);
-    //   }
-    // });
+    });    
 
     return () => {  
       disconnectSub();
-      inviteSub();
-      // textSub();
-      Nearby.stopDiscovery();
-      Nearby.stopAdvertise();
+      inviteSub(); 
     };
-  }, [connectedPeerId, setIsConnected, setConnectedPeerId, setConnectedPeerName]);
+  }, [setIsConnected, setConnectedPeerId, setConnectedPeerName]);
   
 
   return <>

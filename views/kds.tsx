@@ -1,45 +1,67 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useCallback } from "react";
 import { usePriorityQueue } from "../hooks/usePriority-Queue"; 
 import { FlatList, View } from "react-native";
+import { useShallow } from "zustand/react/shallow";
 import { KDS } from "../components/BOH/KDS";  
-import { items as staticItems } from "../util/constants"; 
-import { BOHItem } from "components/BOH/BOHButtons";
+import { items as staticItems, ItemViewType } from "../util/constants"; 
+import { BOHItem } from "../components/BOH/BOHButtons";
 
 export default function Home() {
+  const { pendingItems, inProgressItems, waitingItems, history } = usePriorityQueue(
+    useShallow((state) => ({
+      pendingItems: state.pq.pendingItems,
+      inProgressItems: state.pq.inProgressItems,
+      waitingItems: state.pq.waitingItems,
+      history: state.pq.history,
+    }))
+  );
 
-  const { 
-    pq,
-    remove, 
-    updateStatus,
-    add,
-    recall,
-  } = usePriorityQueue(); 
+  const remove = usePriorityQueue((state) => state.remove);
+  const updateStatus = usePriorityQueue((state) => state.updateStatus);
+  const add = usePriorityQueue((state) => state.add);
+  const recall = usePriorityQueue((state) => state.recall);
+
+  const handleAdd = useCallback((item: ItemViewType, batch: number) => {
+    add({
+      id: Date.now(),
+      status: "pending",
+      batchSize: batch,
+      code: item.code,
+      name: item.name,
+      chineseName: item.chineseName,
+      waiting: false,
+      createdAt: Date.now(),
+      history: []
+    });
+  }, [add]);
+
+  const handleRemove = useCallback((code: string) => {
+    remove(code);
+  }, [remove]);
+
+  const handleRecall = useCallback((id: number) => {
+    recall(id);
+  }, [recall]);
+
+  const handleUpdateStatus = useCallback((code: string) => {
+    updateStatus(code);
+  }, [updateStatus]);
 
   const activeItems = useMemo(() => [
-    ...pq.inProgressItems,
-    ...pq.waitingItems,
-    ...pq.pendingItems,
-  ], [pq.inProgressItems, pq.waitingItems, pq.pendingItems]);
-
-  const historyItems = useMemo(() => [
-    ...pq.history
-  ], [pq.history]);
+    ...inProgressItems,
+    ...waitingItems,
+    ...pendingItems,
+  ], [inProgressItems, waitingItems, pendingItems]);
  
   return (
     <View className={"flex font-sans flex-row bg-white"}>
       <View className="h-screen justify-start w-screen flex flex-row flex-1"> 
         <KDS
           items={activeItems}
-          history={historyItems}
-          onRecall={(id: number) => {
-            recall(id);
-          }}
-          onDelete={(code: string) => {
-            remove(code);
-          }}
-          onUpdateStatus={(code: string, status?: "pending" | "in-progress" | "completed") => {
-            updateStatus(code,);
-          }}
+          history={history}
+          onRecall={handleRecall}
+          onDelete={handleRemove}
+          onUpdateStatus={(code: string) => handleUpdateStatus(code)}
         /> 
       </View>
       <View className="h-16 flex-3">
@@ -49,24 +71,14 @@ export default function Home() {
           data={staticItems} 
           scrollEnabled
           columnWrapperStyle={{ gap: 16 }}
-          renderItem={({ item }) => { 
-            return <BOHItem
+          renderItem={({ item }) => (
+            <BOHItem
               key={item.code}
               item={item}
-              onClickAdd={(batch: number) => {
-                add({
-                  id: Date.now(),
-                  name: item.name,
-                  batchSize: batch,
-                  waiting: false,
-                  status: "in-progress",
-                  createdAt: Date.now(),
-                  code: item.code,
-                  chineseName: item.chineseName
-                });
-              }} 
-            />;
-          }}
+              isFoh={false}
+              onClickAdd={(batch: number) => handleAdd(item, batch)}
+            />
+          )}
         />   
       </View>
     </View>
