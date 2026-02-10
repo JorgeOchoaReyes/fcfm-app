@@ -74,7 +74,7 @@ export default function Home() {
           )}
         />   
       </View>
-      <View className="h-16 flex-1">
+      <View className="h-screen justify-start flex flex-row flex-1"> 
         <FOHTableView 
           items={activeItems}
           history={history} 

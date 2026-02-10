@@ -50,8 +50,8 @@ export const Timer = memo(({
   }, [startTimestamp]);
 
   return (
-    <View className={`font-mono font-bold text-center tabular-nums ${textColor}`}>
-      <Text className={textSize}>{elapsedTime}</Text>
+    <View className={"font-mono font-bold text-center tabular-nums"}>
+      <Text className={textSize + " " + textColor + " " + "font-bold"}>{elapsedTime}</Text>
     </View>
   );
 });

@@ -7,6 +7,7 @@ import { items as staticItems, ItemViewType } from "../util/constants";
 import { BOHItem } from "../components/BOH/BOHButtons";
 
 export default function Home() {
+  const [isMenuCollapsed, setIsMenuCollapsed] = React.useState(false);
   const { pendingItems, inProgressItems, waitingItems, history } = usePriorityQueue(
     useShallow((state) => ({
       pendingItems: state.pq.pendingItems,
@@ -55,32 +56,36 @@ export default function Home() {
  
   return (
     <View className={"flex font-sans flex-row bg-white"}>
-      <View className="h-screen justify-start w-screen flex flex-row flex-1"> 
+      <View className="h-screen justify-start flex flex-row flex-1"> 
         <KDS
           items={activeItems}
           history={history}
           onRecall={handleRecall}
           onDelete={handleRemove}
           onUpdateStatus={(code: string) => handleUpdateStatus(code)}
+          isMenuCollapsed={isMenuCollapsed}
+          onToggleMenu={() => setIsMenuCollapsed(!isMenuCollapsed)}
         /> 
       </View>
-      <View className="h-16 flex-3">
-        <FlatList
-          keyExtractor={(item) => item.code}
-          numColumns={2}  
-          data={staticItems} 
-          scrollEnabled
-          columnWrapperStyle={{ gap: 16 }}
-          renderItem={({ item }) => (
-            <BOHItem
-              key={item.code}
-              item={item}
-              isFoh={false}
-              onClickAdd={(batch: number) => handleAdd(item, batch)}
-            />
-          )}
-        />   
-      </View>
+      {!isMenuCollapsed && (
+        <View className="h-screen flex-6">
+          <FlatList
+            keyExtractor={(item) => item.code}
+            numColumns={2}  
+            data={staticItems} 
+            scrollEnabled
+            columnWrapperStyle={{ gap: 10 }}
+            renderItem={({ item }) => (
+              <BOHItem
+                key={item.code}
+                item={item}
+                isFoh={false}
+                onClickAdd={(batch: number) => handleAdd(item, batch)}
+              />
+            )}
+          />   
+        </View>
+      )}
     </View>
   );
 }

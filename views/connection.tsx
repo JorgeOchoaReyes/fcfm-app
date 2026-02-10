@@ -26,7 +26,14 @@ export default function ConnectionPicker() {
     clearStorage: state.clearStorage
   })));
 
-  const { discoveredPeers, isSearching, startP2P, stopP2P, disconnect } = useNearbySync();
+  const { 
+    discoveredPeers, 
+    isSearching, 
+    startP2P, 
+    stopP2P, 
+    disconnect, 
+    clearDiscoveredPeers
+  } = useNearbySync();
   const clearPriorityQueue = usePriorityQueue(state => state.clearPriorityQueue);
   
   const [isEditingId, setIsEditingId] = useState(false);
@@ -98,7 +105,10 @@ export default function ConnectionPicker() {
               </View>
               <TouchableOpacity 
                 style={styles.disconnectButton} 
-                onPress={() => handleDisconnect(item.peerId)}
+                onPress={() => {
+                  handleDisconnect(item.peerId); 
+                  clearDiscoveredPeers();
+                }}
               >
                 <Ionicons name="close-circle-outline" size={20} color="#fff" />
                 <Text style={styles.disconnectButtonText}>Disconnect</Text>
