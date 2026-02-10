@@ -36,11 +36,12 @@ const textTheme = (item: Item): string => {
     theme = "text-white";
     break;
   case "completed":
+    theme = "text-black";
     break;
   }
   switch (item.waiting) {
   case true:
-    if (item.status !== "in-progress") theme = "text-white";
+    if (item.status !== "in-progress" && item.status !== "completed") theme = "text-white";
     break;
   case false:
     break;
@@ -81,7 +82,7 @@ const KDSItemView = memo(({
         }
       </View>
       <View className="flex-[1] items-center"><Text className={"text-2xl"}>{item.waiting ? "⚠️" : " "}</Text></View>
-      <View className="flex-[2] items-center"><Text className={`text-2xl capitalize ${textTheme(item)}`}>{item.status}</Text></View>
+      <View className="flex-[2] items-center"><Text className={`text-xl capitalize ${textTheme(item)}`}>{item.status === "in-progress" ? "cooking" : item.status}</Text></View>
     </TouchableOpacity>
   );
 });

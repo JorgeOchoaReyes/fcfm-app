@@ -41,7 +41,7 @@ export default function RootLayout() {
   const setIsConnected = useStorageP2P(state => state.setIsConnected);
   const connectedPeerId = useStorageP2P(state => state.connectedPeerId);
   
-  const { clearPriorityQueue } = usePriorityQueue(); 
+  const { clearPriorityQueue, lastUpdated } = usePriorityQueue(); 
 
   useStoreSync(connectedPeerId);
 
@@ -49,9 +49,20 @@ export default function RootLayout() {
     router.navigate("/");
   };
 
-  useEffect(() => {
+  useEffect(() => { 
     requestLocationNeabyDevicesPermission(); 
   }, []);
+
+  // useEffect(() => {
+  //   const intervalId = setInterval(() => {  
+  //     const today = new Date().toISOString().split("T")[0];
+  //     const timestampToDate = new Date(lastUpdated).toISOString().split("T")[0];
+  //     if (timestampToDate !== today) {
+  //       clearPriorityQueue();
+  //     }
+  //   }, 60 * 60 * 1000);
+  //   return () => clearInterval(intervalId);
+  // }, [lastUpdated]);
 
   useEffect(() => {
     const inviteSub = Nearby.onInvitationReceived(async (event) => {  

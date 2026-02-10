@@ -10,10 +10,10 @@ export default function Home() {
   const [isMenuCollapsed, setIsMenuCollapsed] = React.useState(false);
   const { pendingItems, inProgressItems, waitingItems, history } = usePriorityQueue(
     useShallow((state) => ({
-      pendingItems: state.pq.pendingItems,
-      inProgressItems: state.pq.inProgressItems,
-      waitingItems: state.pq.waitingItems,
-      history: state.pq.history,
+      pendingItems: state.pendingItems,
+      inProgressItems: state.inProgressItems,
+      waitingItems: state.waitingItems,
+      history: state.history,
     }))
   );
 
@@ -55,7 +55,7 @@ export default function Home() {
   ], [inProgressItems, waitingItems, pendingItems]);
  
   return (
-    <View className={"flex font-sans flex-row bg-white"}>
+    <View className={"flex font-sans flex-row"}>
       <View className="h-screen justify-start flex flex-row flex-1"> 
         <KDS
           items={activeItems}

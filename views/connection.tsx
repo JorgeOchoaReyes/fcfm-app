@@ -272,7 +272,8 @@ export default function ConnectionPicker() {
               name: connectedPeerName || ""
             },
             ...discoveredPeers
-          ].filter(p => p.peerId !== "")}
+          ].filter(p => p.peerId !== "")
+            .filter(p => p.peerId !== connectedPeerId)}
           keyExtractor={(item) => item.peerId}
           renderItem={renderPeerItem}
           contentContainerStyle={styles.listContent}

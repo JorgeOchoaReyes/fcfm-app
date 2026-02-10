@@ -1,15 +1,13 @@
 import React from "react";
-import { View, TouchableOpacity, StyleSheet, Animated } from "react-native";
-import { Ionicons } from "@expo/vector-icons"; 
+import { View, TouchableOpacity, StyleSheet, Animated } from "react-native"; 
 import { useStorageP2P } from "hooks/useStorage";
 
 const NearbyStatusBadge = () => {
-  const { connectedPeerId, isSearching } = useStorageP2P(); 
+  const { connectedPeerId } = useStorageP2P(); 
 
   const getStatusColor = () => {
-    if (connectedPeerId) return "#52c41a"; // Success green
-    if (isSearching) return "#1890ff"; // Primary blue
-    return "#ff4d4f"; // Error red
+    if (connectedPeerId) return "#52c41a"; 
+    return "#ff4d4f"; 
   }; 
 
   return (
@@ -24,13 +22,7 @@ const NearbyStatusBadge = () => {
               styles.dot, 
               { backgroundColor: getStatusColor()}
             ]} 
-          /> 
-          <Ionicons 
-            name="refresh-circle" 
-            size={20} 
-            color="#999" 
-            style={styles.refreshIcon} 
-          />
+          />  
         </View>
       </TouchableOpacity>
     </View>
@@ -40,9 +32,9 @@ const NearbyStatusBadge = () => {
 const styles = StyleSheet.create({
   container: {
     position: "absolute",
-    bottom: 50, // Below potential status bar or header top
+    bottom: 50, 
     right: 16,
-    zIndex: 9999, // Ensure it's above everything
+    zIndex: 9999, 
     elevation: 5,
   },
   badge: {
@@ -63,8 +55,7 @@ const styles = StyleSheet.create({
   dot: {
     width: 8,
     height: 8,
-    borderRadius: 4,
-    marginRight: 8,
+    borderRadius: 4, 
   },
   statusText: {
     fontSize: 10,
