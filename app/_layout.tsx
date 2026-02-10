@@ -5,7 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import NearbyStatusBadge from "../components/NearbyStatusBadge";
 import { useStorageP2P } from "../hooks/useStorage";
 import * as Nearby from "expo-nearby-connections";
-import { usePriorityQueue } from "../hooks/usePriority-Queue";
+// import { usePriorityQueue } from "../hooks/usePriority-Queue";
 import { useStoreSync } from "../hooks/useSyncHook";
 
 const requestLocationNeabyDevicesPermission = async () => {
@@ -41,12 +41,16 @@ export default function RootLayout() {
   const setIsConnected = useStorageP2P(state => state.setIsConnected);
   const connectedPeerId = useStorageP2P(state => state.connectedPeerId);
   
-  const { clearPriorityQueue, lastUpdated } = usePriorityQueue(); 
+  // const { clearPriorityQueue, lastUpdated } = usePriorityQueue(); 
 
   useStoreSync(connectedPeerId);
 
   const returnFunctiton = () => {
-    router.navigate("/");
+    if (router.canDismiss()) {
+      router.dismissAll();
+    } else {
+      router.replace("/");
+    }
   };
 
   useEffect(() => { 

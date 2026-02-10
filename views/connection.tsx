@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, ActivityIndicator } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import * as Nearby from "expo-nearby-connections";
 import { useStorageP2P } from "../hooks/useStorage";
 import { useNearbySync } from "../hooks/useNearbySync";
@@ -190,10 +190,7 @@ export default function ConnectionPicker() {
           </TouchableOpacity>
         </View> 
 
-        <View>  
-          <Text style={{textAlign: "center", fontSize: 20, fontWeight: "bold"}}> 
-          Status: {isHub ? "Hub" : "Client"}
-          </Text>
+        <View>   
           <View style={{flexDirection: "row", alignItems: "center", justifyContent: "center"}}> 
             <TouchableOpacity style={{
               backgroundColor: "#4A90E2",
@@ -201,8 +198,12 @@ export default function ConnectionPicker() {
               borderRadius: 10, 
               marginRight: 10,
               alignItems: "center",
+              flexDirection: "row",
+              justifyContent: "center",
             }} onPress={handleMakeHub}>
-              <Text style={{...styles.sectionTitle, color: "white"}}>Make Hub</Text>
+              {isHub ? <FontAwesome5 name="crown" size={20} style={{marginRight: 10}} color="gold" /> : ""}
+              <Text style={{...styles.sectionTitle, color: "white", }}> 
+                Make Hub</Text>
             </TouchableOpacity> 
             <TouchableOpacity style={{
               backgroundColor: "#4A90E2",
@@ -210,8 +211,13 @@ export default function ConnectionPicker() {
               borderRadius: 10, 
               marginRight: 10,
               alignItems: "center",
+              flexDirection: "row",
+              justifyContent: "center",
             }} onPress={handleMakeClient}>
-              <Text style={{...styles.sectionTitle, color: "white"}}>Make Client</Text>
+              {!isHub ? <FontAwesome5 name="crown" size={18} style={{marginRight: 10}} color="gold" /> : ""}
+              <Text style={{...styles.sectionTitle, color: "white"}}>
+                Make Client
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
