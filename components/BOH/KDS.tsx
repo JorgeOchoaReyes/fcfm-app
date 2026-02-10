@@ -26,6 +26,27 @@ const assignBgTheme = (item: Item): string => {
   return theme;
 };
 
+const textTheme = (item: Item): string => {
+  let theme = "";
+  switch (item.status) {
+  case "pending":
+    theme = "text-black";
+    break;
+  case "in-progress":
+    theme = "text-white";
+    break;
+  case "completed":
+    break;
+  }
+  switch (item.waiting) {
+  case true:
+    if (item.status !== "in-progress") theme = "text-white";
+    break;
+  case false:
+    break;
+  } 
+  return theme;
+};
 
 const KDSItemView = memo(({
   item, 
@@ -40,8 +61,7 @@ const KDSItemView = memo(({
   itemCompleted: boolean;
   showChinese: boolean;
   onRecall: (id: number) => void;
-}) => {
-  const active = (item.status === "in-progress" || item.waiting);
+}) => { 
   const completed = itemCompleted;
 
   return (
@@ -56,19 +76,19 @@ const KDSItemView = memo(({
         }
       }}
     >
-      <View className="flex-[4] font-semibold"><Text className="text-xl font-bold" numberOfLines={1}>{showChinese ? item.chineseName : item.name}</Text></View>
-      <View className="flex-[1] items-center"><Text className="text-xl font-bold">#{item.batchSize}</Text></View>
-      <View className="flex-[2] items-center">  
+      <View className="flex-[4] font-semibold"><Text className={`text-3xl font-bold ${textTheme(item)}`} numberOfLines={1}>{showChinese ? item.chineseName : item.name}</Text></View>
+      <View className="flex-[1] items-center"><Text className={`text-3xl font-bold ${textTheme(item)}`}>#{item.batchSize}</Text></View>
+      <View className="flex-[2] items-center">   
         {
           completed ? <Text className="text-xl font-bold text-slate-400">--:--</Text> : <Timer 
             textSize="text-xl"
-            textColor={active ? "text-white" : "text-black"} 
+            textColor={textTheme(item)} 
             startTimestamp={item.createdAt} 
           />
         }
       </View>
-      <View className="flex-[1] items-center"><Text className="text-xls font-bold">{item.waiting ? "⚠️" : " "}</Text></View>
-      <View className="flex-[2] items-center"><Text className="text-xl font-bold capitalize">
+      <View className="flex-[1] items-center"><Text className={"text-3xl font-bold"}>{item.waiting ? "⚠️" : " "}</Text></View>
+      <View className="flex-[2] items-center"><Text className={`text-3xl font-bold capitalize ${textTheme(item)}`}>
         {item.status === "in-progress" ? "cooking" : item.status}
       </Text></View> 
     </TouchableOpacity>
@@ -81,6 +101,8 @@ interface KDSProps {
   onRecall: (id: number) => void;
   onDelete: (name: string) => void;
   onUpdateStatus: (code: string, status?: "pending" | "in-progress" | "completed") => void;
+  isMenuCollapsed?: boolean;
+  onToggleMenu?: () => void;
 }
 
 export const KDS = ({
@@ -89,15 +111,18 @@ export const KDS = ({
   onDelete,
   onUpdateStatus,
   onRecall,
+  isMenuCollapsed = false,
+  onToggleMenu,
 }: KDSProps) => {
   const [showHistory, setShowHistory] = useState(false);
   const { showChinese, setShowChinese } = useStorageP2P();
+ 
   
   return (
-    <View className="rounded-2x p-6 overflow-auto w-full">
+    <View className="rounded-2x p-6 flex-1 w-full h-[90vh]">
       <View className="flex flex-row items-center mb-4">
         <Text className="text-2xl font-bold flex-1">{showHistory ? "History" : "Items"}</Text>
-        <View className="flex flex-row items-center">
+        <View className="flex flex-row items-center mr-4">
           <Text>Chinese</Text>
           <Switch 
             value={showChinese}
@@ -107,9 +132,17 @@ export const KDS = ({
         <TouchableOpacity
           onPress={() => setShowHistory(!showHistory)}
           delayPressIn={0} 
-          className="rounded-md cursor-pointer hover:bg-slate-300 bg-slate-200 text-black flex items-center text-sm p-2 align-end">
+          className="rounded-md cursor-pointer hover:bg-slate-300 bg-slate-200 text-black flex items-center text-sm p-2 mr-2">
           <Text>{showHistory ? "Hide Completed" : "Show Completed"}</Text>
         </TouchableOpacity> 
+        {onToggleMenu && (
+          <TouchableOpacity
+            onPress={onToggleMenu}
+            delayPressIn={0}
+            className="rounded-md cursor-pointer hover:bg-slate-300 bg-slate-200 text-black flex items-center text-sm p-2">
+            <Text>{isMenuCollapsed ? "Expand Menu" : "Collapse Menu"}</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       <View className="flex flex-row items-center px-4 mb-2 pb-2 border-b border-slate-300">
@@ -122,11 +155,9 @@ export const KDS = ({
       <FlatList
         data={showHistory ? history : items}
         keyExtractor={(item) => item.code + item.id}
-        scrollEnabled
-        numColumns={1}
-        contentContainerStyle={{
-          gap: 5,
-        }}
+        scrollEnabled 
+        numColumns={1} 
+        contentContainerStyle={{ gap: 10 }}
         renderItem={({ item }) => (
           <KDSItemView
             key={item.id}

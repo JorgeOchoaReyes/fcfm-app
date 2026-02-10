@@ -26,6 +26,28 @@ const assignBgTheme = (item: Item): string => {
   return theme;
 };
 
+const textTheme = (item: Item): string => {
+  let theme = "";
+  switch (item.status) {
+  case "pending":
+    theme = "text-black";
+    break;
+  case "in-progress":
+    theme = "text-white";
+    break;
+  case "completed":
+    break;
+  }
+  switch (item.waiting) {
+  case true:
+    if (item.status !== "in-progress") theme = "text-white";
+    break;
+  case false:
+    break;
+  } 
+  return theme;
+};
+
 const KDSItemView = memo(({
   item,
   itemCompleted = false,
@@ -36,8 +58,7 @@ const KDSItemView = memo(({
   itemCompleted: boolean; 
   onPress: () => void;
   unmarkWaiting: (code: string) => void;
-}) => {
-  const active = (item.status === "in-progress" || item.waiting);
+}) => { 
   const completed = itemCompleted;
 
   return (
@@ -45,21 +66,22 @@ const KDSItemView = memo(({
       onPress={
         item.waiting ? () => unmarkWaiting(item.code) : () => onPress()
       }
-      className={`flex flex-row items-center p-2 m-1 rounded-xl ${completed ? "bg-slate-200 text-black" : assignBgTheme(item)}`}
+      delayPressIn={0}
+      className={`flex flex-row items-center p-2 rounded-xl ${completed ? "bg-slate-200 text-black" : assignBgTheme(item)}`}
     >
-      <View className="flex-[1] items-center font-bold"><Text className="text-xl font-bold" numberOfLines={1}>{item.code}</Text></View>
-      <View className="flex-[2] items-center"><Text className="text-xl">#{item.batchSize}</Text></View>
+      <View className="flex-[1] items-center font-bold"><Text className={`text-2xl font-bold ${textTheme(item)}`} numberOfLines={1}>{item.code}</Text></View>
+      <View className="flex-[2] items-center"><Text className={`text-2xl font-bold ${textTheme(item)}`}>#{item.batchSize}</Text></View>
       <View className="flex-[2] items-center">
         {
           completed ? <Text className="text-xl text-slate-400">--:--</Text> : <Timer 
-            textSize="text-xl"
-            textColor={active ? "text-white" : "text-black"} 
+            textSize="text-2xl"
+            textColor={textTheme(item)} 
             startTimestamp={item.createdAt} 
           />
         }
       </View>
-      <View className="flex-[1] items-center"><Text className="text-xl">{item.waiting ? "⚠️" : " "}</Text></View>
-      <View className="flex-[2] items-center"><Text className="text-lg capitalize">{item.status}</Text></View>
+      <View className="flex-[1] items-center"><Text className={"text-2xl"}>{item.waiting ? "⚠️" : " "}</Text></View>
+      <View className="flex-[2] items-center"><Text className={`text-2xl capitalize ${textTheme(item)}`}>{item.status}</Text></View>
     </TouchableOpacity>
   );
 });
@@ -79,7 +101,7 @@ export const FOHTableView = ({
 }: FOHTableViewProps) => {
   const [showHistory, setShowHistory] = useState(false);
   return (
-    <View className="rounded-2x p-6 overflow-auto">
+    <View className="rounded-2x p-6 flex-1 w-full h-[90vh]">
       <View className="flex flex-row items-center mb-4">
         <Text className="text-2xl font-bold flex-1">{showHistory ? "History" : "Items"}</Text>
         <TouchableOpacity
@@ -101,6 +123,7 @@ export const FOHTableView = ({
         keyExtractor={(item) => item.code}
         scrollEnabled
         numColumns={1}
+        contentContainerStyle={{ gap: 10 }}
         renderItem={({ item }) => (
           <KDSItemView
             key={item.id}
