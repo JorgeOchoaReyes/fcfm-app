@@ -18,7 +18,7 @@ const assignBgTheme = (item: Item): string => {
   }
   switch (item.waiting) {
   case true:
-    if (item.status !== "in-progress") theme = "bg-red-500 text-white";
+    if (item.status !== "in-progress") theme = "bg-red-500";
     break;
   case false:
     break;
@@ -36,11 +36,12 @@ const textTheme = (item: Item): string => {
     theme = "text-white";
     break;
   case "completed":
+    theme = "text-black";
     break;
   }
   switch (item.waiting) {
   case true:
-    if (item.status !== "in-progress") theme = "text-white";
+    if (item.status !== "in-progress" && item.status !== "completed") theme = "text-white";
     break;
   case false:
     break;

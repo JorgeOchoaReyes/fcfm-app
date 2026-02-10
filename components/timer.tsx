@@ -2,17 +2,13 @@ import React, { useEffect, useState, memo } from "react";
 import { Text, View } from "react-native";
 
 interface ElapsedTimerProps {
-  startTimestamp: number // Unix epoch timestamp in milliseconds
-  title?: string
-  description?: string
+  startTimestamp: number 
   textColor?: string
   textSize?: string
 }
 
 export const Timer = memo(({ 
-  startTimestamp,
-  title = "Elapsed Time",
-  description,
+  startTimestamp, 
   textColor = "text-black",
   textSize = "text-md"
 }: ElapsedTimerProps) => {
@@ -24,7 +20,7 @@ export const Timer = memo(({
       const elapsed = now - startTimestamp;
 
       if (elapsed < 0) {
-        setElapsedTime(prev => prev === "Timer not started yet" ? prev : "Timer not started yet");
+        setElapsedTime(prev => prev === "00:00" ? prev : "00:00");
         return;
       }
 

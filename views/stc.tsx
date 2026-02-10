@@ -9,10 +9,10 @@ import { useShallow } from "zustand/react/shallow";
 export default function Home() {
   const { pendingItems, inProgressItems, waitingItems, history } = usePriorityQueue(
     useShallow((state) => ({
-      pendingItems: state.pq.pendingItems,
-      inProgressItems: state.pq.inProgressItems,
-      waitingItems: state.pq.waitingItems,
-      history: state.pq.history,
+      pendingItems: state.pendingItems,
+      inProgressItems: state.inProgressItems,
+      waitingItems: state.waitingItems,
+      history: state.history,
     }))
   );
 

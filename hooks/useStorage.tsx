@@ -28,7 +28,7 @@ interface DBStorage {
 
 export const useStorageP2P  = create<DBStorage>()(
   persist(
-    (set, get) => ({ 
+    (set) => ({ 
       preferredPeerId: null,  
       deviceId: "",  
       connectedPeerId: null,
