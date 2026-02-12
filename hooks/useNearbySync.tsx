@@ -6,14 +6,14 @@ export const useNearbySync = () => {
   const { 
     preferredPeerId, 
     connectedPeerId,
-    setConnectedPeerId, 
-    deviceId, 
-    setIsSearching,
-    setConnectedPeerName,
     isConnected,
     isSearching,
+    deviceId, 
+    isHub,
+    setConnectedPeerId, 
+    setIsSearching,
+    setConnectedPeerName,
     setIsConnected,
-    isHub
   } = useStorageP2P();
 
   const [discoveredPeers, setDiscoveredPeers] = useState<Nearby.BasePeer[]>([]);

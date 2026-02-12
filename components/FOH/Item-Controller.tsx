@@ -13,7 +13,6 @@ export interface ItemControllerProps {
 
 export function ItemController({
   item,
-  waiting,
   onClickAdd,
   onClickMarkWaiting, 
 }: ItemControllerProps) {
