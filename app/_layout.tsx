@@ -4,9 +4,9 @@ import { TouchableOpacity, PermissionsAndroid, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import NearbyStatusBadge from "../components/NearbyStatusBadge";
 import { useStorageP2P } from "../hooks/useStorage";
-import * as Nearby from "expo-nearby-connections";
-// import { usePriorityQueue } from "../hooks/usePriority-Queue";
+import * as Nearby from "expo-nearby-connections"; 
 import { useStoreSync } from "../hooks/useSyncHook";
+import { usePriorityQueue } from "hooks/usePriority-Queue";
 
 const requestLocationNeabyDevicesPermission = async () => {
   try {
@@ -39,9 +39,10 @@ export default function RootLayout() {
   const setConnectedPeerId = useStorageP2P(state => state.setConnectedPeerId);
   const setConnectedPeerName = useStorageP2P(state => state.setConnectedPeerName);
   const setIsConnected = useStorageP2P(state => state.setIsConnected);
-  const connectedPeerId = useStorageP2P(state => state.connectedPeerId);
-  
-  // const { clearPriorityQueue, lastUpdated } = usePriorityQueue(); 
+  const setDateOfStorage = useStorageP2P(state => state.setDateOfStorage);
+  const clearPriorityQueue = usePriorityQueue(state => state.clearPriorityQueue);
+  const dateOfStorage = useStorageP2P(state => state.dateOfStorage); 
+  const connectedPeerId = useStorageP2P(state => state.connectedPeerId); 
 
   useStoreSync(connectedPeerId);
 
@@ -57,16 +58,16 @@ export default function RootLayout() {
     requestLocationNeabyDevicesPermission(); 
   }, []);
 
-  // useEffect(() => {
-  //   const intervalId = setInterval(() => {  
-  //     const today = new Date().toISOString().split("T")[0];
-  //     const timestampToDate = new Date(lastUpdated).toISOString().split("T")[0];
-  //     if (timestampToDate !== today) {
-  //       clearPriorityQueue();
-  //     }
-  //   }, 60 * 60 * 1000);
-  //   return () => clearInterval(intervalId);
-  // }, [lastUpdated]);
+  useEffect(() => {  
+    const intervalId = setInterval(() => {  
+      const isNewDay = dateOfStorage !== new Date().getDate();
+      if (isNewDay) { 
+        setDateOfStorage(new Date().getDate());
+        clearPriorityQueue();
+      }
+    }, 60 * 60 * 1000);
+    return () => clearInterval(intervalId); 
+  }, [dateOfStorage, setDateOfStorage, clearPriorityQueue]);
 
   useEffect(() => {
     const inviteSub = Nearby.onInvitationReceived(async (event) => {  

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import * as Nearby from "expo-nearby-connections";
 import { useStorageP2P } from "../hooks/useStorage";
 
@@ -31,7 +31,7 @@ export const useNearbySync = () => {
     } catch (e) {
       console.error("P2P Init Error:", e);
     }
-  }, [setIsSearching, deviceId]);
+  }, [setIsSearching, isHub, deviceId]);
 
   const stopP2P = useCallback(async () => {
     try {
@@ -57,12 +57,8 @@ export const useNearbySync = () => {
 
   useEffect(() => { 
     const inviteSub = Nearby.onInvitationReceived(async (event) => {  
-      if (["BOH", "FOH"].includes(event.name)) { 
-        try {
-          await Nearby.acceptConnection(event.peerId); 
-        } catch (e) { 
-          
-        }
+      if (["BOH", "FOH"].includes(event.name)) {  
+        await Nearby.acceptConnection(event.peerId); 
       }  
     });
  
@@ -70,18 +66,27 @@ export const useNearbySync = () => {
       setIsConnected(true);
       setConnectedPeerId(event.peerId);
       setConnectedPeerName(event.name);
-      setIsSearching(false);  
+      setIsSearching(false);   
     });
  
     const textSub = Nearby.onTextReceived((event) => {
       console.log("📩 New Message Received:", event.text);
     });
 
-    const foundSub = Nearby.onPeerFound((event) => { 
+    const foundSub = Nearby.onPeerFound(async (event) => { 
       setDiscoveredPeers(prev => {
         const exists = prev.find(p => p.peerId === event.peerId);
         return exists ? prev : [...prev, event];
       });
+      if(["BOH", "FOH"].includes(event.name)) {
+        try { 
+          if(connectedPeerId === null) {
+            await Nearby.requestConnection(event.peerId);  
+          }
+        } catch (e) {
+          console.error("Request Connection Error:", e);
+        }
+      }
     });
 
     const lostSub = Nearby.onPeerLost((event) => {
@@ -112,7 +117,7 @@ export const useNearbySync = () => {
       Nearby.stopDiscovery();
       Nearby.stopAdvertise();
     };
-  }, [startP2P, preferredPeerId, setConnectedPeerId, setConnectedPeerName, setIsConnected, setIsSearching]);
+  }, [startP2P, preferredPeerId, setConnectedPeerId, setConnectedPeerName, setIsConnected, setIsSearching, connectedPeerId]);
  
   const clearDiscoveredPeers = useCallback(() => {
     setDiscoveredPeers([]);

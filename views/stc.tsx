@@ -77,7 +77,7 @@ export default function Home() {
       <View className="h-screen justify-start flex flex-row flex-1"> 
         <FOHTableView 
           items={activeItems}
-          history={history} 
+          history={history.sort((a, b) => b.createdAt - a.createdAt)} 
           markWaiting={handleMarkWaiting}
           unmarkWaiting={handleUnmarkWaiting}
         />

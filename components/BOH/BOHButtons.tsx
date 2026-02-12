@@ -17,8 +17,11 @@ export const BOHItem = React.memo(({
   isFoh
 }: ItemControllerProps) => {
   const { showChinese } = useStorageP2P();
+
   return (
-    <View className={"w-[200px] mx-auto my-1"}>
+    <TouchableOpacity className={"w-[200px] mx-auto my-1"} onPress={() => {
+      onClickAdd(2);
+    }}>
       <View className="bg-red-500  rounded-2xl shadow-lg overflow-hidden">
         <View className="px-4 flex items-center py-2 text-center relative">
           <View className="flex flex-row justify-between items-center"> 
@@ -40,7 +43,10 @@ export const BOHItem = React.memo(({
                       onPress={() => onClickAdd(n)}
                       delayPressIn={0} 
                     >
-                      <Text style={styles.buttonText}>{n}</Text>
+                      <Text style={{
+                        ...styles.buttonText,
+                        color: n === 2 ? "white" : "black",
+                      }}>{n}</Text>
                     </TouchableOpacity>
                   </View>
                 ))} 
@@ -49,7 +55,7 @@ export const BOHItem = React.memo(({
           </View> 
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 });
 
@@ -68,7 +74,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   redButton: {
-    backgroundColor: "white",
+    backgroundColor: "#EF4444",
     display: "flex",
     justifyContent: "center",       
     borderTopWidth: 1,  
