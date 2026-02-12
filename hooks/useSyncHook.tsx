@@ -5,7 +5,6 @@ import { useAudioPlayer } from "expo-audio";
 
 const clickSoundSource = require("../assets/bell-sfx.mp3");
 
-
 export const useStoreSync = (connectedPeerId: string | null) => {
   const isInternalUpdate = useRef(false);
   const player = useAudioPlayer(clickSoundSource);
