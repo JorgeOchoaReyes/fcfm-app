@@ -35,6 +35,7 @@ export default function ConnectionPicker() {
     clearDiscoveredPeers
   } = useNearbySync();
   const clearPriorityQueue = usePriorityQueue(state => state.clearPriorityQueue);
+  const dateOfStorage = useStorageP2P(state => state.dateOfStorage);
   
   const [isEditingId, setIsEditingId] = useState(false);
   const [tempDeviceId, setTempDeviceId] = useState(deviceId);
@@ -134,6 +135,7 @@ export default function ConnectionPicker() {
         <View>
           <Text style={styles.headerSubtitle}>FCFM Network</Text>
           <Text style={styles.headerTitle}>Connections</Text>
+          <Text style={{fontSize: 12, color: "#4A90E2"}}>Date of Storage: {dateOfStorage} </Text>
         </View>
         <TouchableOpacity style={styles.refreshCircle} onPress={handleStartP2P} disabled={isSearching}>
           {isSearching ? (
@@ -279,7 +281,7 @@ export default function ConnectionPicker() {
             },
             ...discoveredPeers
           ].filter(p => p.peerId !== "")
-            .filter(p => p.peerId !== connectedPeerId)}
+          }
           keyExtractor={(item) => item.peerId}
           renderItem={renderPeerItem}
           contentContainerStyle={styles.listContent}

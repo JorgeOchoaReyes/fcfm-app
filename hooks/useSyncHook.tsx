@@ -1,22 +1,43 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { usePriorityQueue } from "./usePriority-Queue";
 import * as Nearby from "expo-nearby-connections"; 
+import { useAudioPlayer } from "expo-audio";
+
+const clickSoundSource = require("../assets/bell-sfx.mp3");
+
 
 export const useStoreSync = (connectedPeerId: string | null) => {
   const isInternalUpdate = useRef(false);
+  const player = useAudioPlayer(clickSoundSource);
+
+  const playSFX = useCallback(() => {
+    try {
+      if (player.isLoaded) {
+        player.seekTo(0);
+      }
+
+      player.play();
+      console.log("Playing SFX");
+    } catch (error) {
+      console.error("Error playing SFX:", error);
+    }
+  }, [player]); 
 
   useEffect(() => {
     if (!connectedPeerId) return;
  
-    const unsubscribeStore = usePriorityQueue.subscribe(async (state) => {
+    const unsubscribeStore = usePriorityQueue.subscribe(async (state, prevState) => {
       if (isInternalUpdate.current) {
         isInternalUpdate.current = false;
         return;
-      }
+      } 
+
+      const mutationIsAdd = state.instanceTracker.length > prevState.instanceTracker.length;
 
       await Nearby.sendText(connectedPeerId, JSON.stringify({
         type: "SYNC_STATE",
-        state: state
+        state: state, 
+        mutation: mutationIsAdd ? "ADD" : "OTHER",
       }));
     });
  
@@ -27,11 +48,13 @@ export const useStoreSync = (connectedPeerId: string | null) => {
           const remoteState = payload.state;
           const localState = usePriorityQueue.getState();
  
-          if (remoteState.lastUpdated > localState.lastUpdated) {
-            console.log("Remote is newer, updating...");
+          if (remoteState.lastUpdated > localState.lastUpdated) { 
             isInternalUpdate.current = true;
             usePriorityQueue.setState(remoteState);
-          } else {
+            if(payload.mutation === "ADD") {
+              playSFX();
+            }
+          } else { 
             console.log("Local is newer, ignoring remote sync.");
           }
         }
@@ -44,5 +67,5 @@ export const useStoreSync = (connectedPeerId: string | null) => {
       unsubscribeStore();
       unsubscribeNearby();
     };
-  }, [connectedPeerId]);
+  }, [connectedPeerId, playSFX]);
 };

@@ -67,7 +67,7 @@ const KDSItemView = memo(({
 
   return (
     <TouchableOpacity
-      className={`flex flex-row p-2 items-center rounded-xl border border-slate-500 ${completed ? "bg-slate-200 text-black" : assignBgTheme(item)}`}
+      className={`flex flex-row p-9 items-center rounded-3xl border border-slate-500 ${completed ? "bg-slate-200 text-black" : assignBgTheme(item)}`}
       delayPressIn={0} 
       onPress={() => {
         if (completed) {
@@ -77,19 +77,19 @@ const KDSItemView = memo(({
         }
       }}
     >
-      <View className="flex-[4] font-semibold"><Text className={`text-3xl font-bold ${textTheme(item)}`} numberOfLines={1}>{showChinese ? item.chineseName : item.name}</Text></View>
-      <View className="flex-[1] items-center"><Text className={`text-3xl font-bold ${textTheme(item)}`}>#{item.batchSize}</Text></View>
+      <View className="flex-[4] font-semibold"><Text className={`text-4xl font-bold ${textTheme(item)}`} numberOfLines={1}>{showChinese ? item.chineseName : item.name}</Text></View>
+      <View className="flex-[1] items-center"><Text className={`text-4xl font-bold ${textTheme(item)}`}>#{item.batchSize}</Text></View>
       <View className="flex-[2] items-center">   
         {
-          completed ? <Text className="text-xl font-bold text-slate-400">--:--</Text> : <Timer 
-            textSize="text-xl"
+          completed ? <Text className="text-4xl font-bold text-slate-400">--:--</Text> : <Timer 
+            textSize="text-4xl"
             textColor={textTheme(item)} 
             startTimestamp={item.createdAt} 
           />
         }
       </View>
-      <View className="flex-[1] items-center"><Text className={"text-3xl font-bold"}>{item.waiting ? "⚠️" : " "}</Text></View>
-      <View className="flex-[2] items-center"><Text className={`text-3xl font-bold capitalize ${textTheme(item)}`}>
+      <View className="flex-[1] items-center"><Text className={"text-4xl font-bold"}>{item.waiting ? "⚠️" : " "}</Text></View>
+      <View className="flex-[2] items-center"><Text className={`text-4xl font-bold capitalize ${textTheme(item)}`}>
         {item.status === "in-progress" ? "cooking" : item.status}
       </Text></View> 
     </TouchableOpacity>

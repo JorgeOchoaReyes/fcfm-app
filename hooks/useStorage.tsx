@@ -14,6 +14,7 @@ interface DBStorage {
   isConnected: boolean;
   isHub: boolean;
   showChinese: boolean;
+  dateOfStorage: number;
  
   setIsConnected: (connected: boolean) => void;
   setDeviceId: (id: string) => void;
@@ -24,6 +25,7 @@ interface DBStorage {
   clearStorage: () => void; 
   setIsHub: (hub: boolean) => void;
   setShowChinese: (showChinese: boolean) => void;
+  setDateOfStorage: (date: number) => void;
 }
 
 export const useStorageP2P  = create<DBStorage>()(
@@ -37,6 +39,9 @@ export const useStorageP2P  = create<DBStorage>()(
       isConnected: false,
       isHub: false,
       showChinese: false,
+      dateOfStorage: new Date().getDate(),
+
+      setDateOfStorage: (date: number) => set({ dateOfStorage: date }),
        
       setDeviceId: (id: string) => set({ deviceId: id }),
       setShowChinese: (showChinese: boolean) => set({ showChinese: showChinese }),

@@ -59,7 +59,7 @@ export default function Home() {
       <View className="h-screen justify-start flex flex-row flex-1"> 
         <KDS
           items={activeItems}
-          history={history}
+          history={history.sort((a, b) => b.createdAt - a.createdAt)}
           onRecall={handleRecall}
           onDelete={handleRemove}
           onUpdateStatus={(code: string) => handleUpdateStatus(code)}
