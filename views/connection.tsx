@@ -136,6 +136,7 @@ export default function ConnectionPicker() {
           <Text style={styles.headerSubtitle}>FCFM Network</Text>
           <Text style={styles.headerTitle}>Connections</Text>
           <Text style={{fontSize: 12, color: "#4A90E2"}}>Date of Storage: {dateOfStorage} </Text>
+          <Text style={{fontSize: 12, color: "#4A90E2"}}>Verssion: 1:18 02/12/2026 </Text>
         </View>
         <TouchableOpacity style={styles.refreshCircle} onPress={handleStartP2P} disabled={isSearching}>
           {isSearching ? (

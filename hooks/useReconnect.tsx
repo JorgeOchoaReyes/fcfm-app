@@ -33,6 +33,16 @@ export const useReconnect = () => {
 
   
   useEffect(() => { 
+    const peersFound = Nearby.onPeerFound(async (event) => {
+      if (["BOH", "FOH"].includes(event.name)) {
+        try {
+          await Nearby.requestConnection(event.peerId);
+        } catch (e) {
+          console.error("Error requesting connection in useReconnect:", e);
+        }
+      }
+    });
+
     const inviteSub = Nearby.onInvitationReceived(async (event) => {  
       if (["BOH", "FOH"].includes(event.name)) { 
         try {
@@ -42,7 +52,7 @@ export const useReconnect = () => {
         }
       }  
     });
-  
+
     const disconnectSub = Nearby.onDisconnected(() => { 
       setIsConnected(false);
       setIsSearching(false); 
@@ -70,6 +80,7 @@ export const useReconnect = () => {
     return () => {  
       disconnectSub();
       inviteSub(); 
+      peersFound();
       appStateSub.remove();
       if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current);
     };

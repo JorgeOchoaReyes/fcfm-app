@@ -15,8 +15,7 @@ export const useStoreSync = (connectedPeerId: string | null) => {
         player.seekTo(0);
       }
 
-      player.play();
-      console.log("Playing SFX");
+      player.play(); 
     } catch (error) {
       console.error("Error playing SFX:", error);
     }
