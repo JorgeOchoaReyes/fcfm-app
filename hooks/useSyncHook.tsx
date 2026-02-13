@@ -15,8 +15,7 @@ export const useStoreSync = (connectedPeerId: string | null) => {
         player.seekTo(0);
       }
 
-      player.play();
-      console.log("Playing SFX");
+      player.play(); 
     } catch (error) {
       console.error("Error playing SFX:", error);
     }
@@ -52,6 +51,7 @@ export const useStoreSync = (connectedPeerId: string | null) => {
             usePriorityQueue.setState(remoteState);
             if(payload.mutation === "ADD") {
               playSFX();
+              alert("New order added!");
             }
           } else { 
             console.log("Local is newer, ignoring remote sync.");
