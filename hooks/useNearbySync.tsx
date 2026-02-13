@@ -91,18 +91,12 @@ export const useNearbySync = () => {
 
     const lostSub = Nearby.onPeerLost((event) => {
       setDiscoveredPeers(prev => prev.filter(p => p.peerId !== event.peerId));
-      if (event.peerId === preferredPeerId || event.peerId === connectedPeerId) {
-        setIsConnected(false);
-        setConnectedPeerId(null);
-        setConnectedPeerName("");
-      }
     });
 
     const disconnectSub = Nearby.onDisconnected((event) => { 
       setIsConnected(false);
       setConnectedPeerId(null);
-      setConnectedPeerName(""); 
-      startP2P(); 
+      setConnectedPeerName("");  
     }); 
 
     startP2P();
