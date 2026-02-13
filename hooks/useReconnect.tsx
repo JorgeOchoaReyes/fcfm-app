@@ -13,11 +13,13 @@ export const useReconnect = () => {
   const setIsConnected = useStorageP2P(state => state.setIsConnected);
   const setIsSearching = useStorageP2P(state => state.setIsSearching);
   const setConnectedPeerName = useStorageP2P(state => state.setConnectedPeerName); 
+  const connectedPeerId = useStorageP2P(state => state.connectedPeerId);
   
   const reconnectTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const attemptReconnect = useCallback(async () => {
     if (isConnected) return; 
+    if(isSearching) return;
 
     try {
       setIsSearching(true);
@@ -30,11 +32,16 @@ export const useReconnect = () => {
       console.error("Error starting P2P during reconnect:", e);
       setIsSearching(false);
     }
-  }, [isConnected, isHub, deviceId, setIsSearching]);
+  }, [isConnected, isSearching, setIsSearching, isHub, deviceId]);
 
   
   useEffect(() => { 
     const peersFound = Nearby.onPeerFound(async (event) => {
+      const currentConnectedPeerId = useStorageP2P.getState().connectedPeerId;
+      const currentIsConnected = useStorageP2P.getState().isConnected;
+
+      if (currentIsConnected || currentConnectedPeerId) return;
+
       if (["BOH", "FOH"].includes(event.name)) {
         try {
           await Nearby.requestConnection(event.peerId);
@@ -68,7 +75,17 @@ export const useReconnect = () => {
 
     const appStateSub = AppState.addEventListener("change", (nextAppState: AppStateStatus) => {
       if (nextAppState === "active") { 
-        if (!isConnected) {
+        const sendPing = async () => {
+          try {
+            if (!connectedPeerId) return false;
+            await Nearby.sendText(connectedPeerId, "ping");
+            return true; 
+          } catch (e) {
+            console.error("Error sending ping in useReconnect:", e);
+            return false; 
+          }
+        };
+        if (!isConnected && !sendPing()) {
           attemptReconnect();
         }
       }
@@ -79,6 +96,13 @@ export const useReconnect = () => {
       setConnectedPeerName(event.name);
       setIsConnected(true);
       setIsSearching(false);
+      
+      try {
+        await Nearby.stopDiscovery();
+        await Nearby.stopAdvertise();
+      } catch (e) {
+        console.error("Error stopping P2P after connection:", e);
+      }
  
       // If we are connected and are the hub we are the main DB so send our db
       if(isHub) {
@@ -103,6 +127,6 @@ export const useReconnect = () => {
       appStateSub.remove();
       if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current);
     };
-  }, [setIsConnected, setIsSearching, setConnectedPeerId, setConnectedPeerName, isConnected, attemptReconnect, isSearching]);
+  }, [setIsConnected, setIsSearching, setConnectedPeerId, setConnectedPeerName, isConnected, attemptReconnect, isSearching, isHub]);
   
 };
