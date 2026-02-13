@@ -51,6 +51,7 @@ export const useStoreSync = (connectedPeerId: string | null) => {
             usePriorityQueue.setState(remoteState);
             if(payload.mutation === "ADD") {
               playSFX();
+              alert("New order added!");
             }
           } else { 
             console.log("Local is newer, ignoring remote sync.");
