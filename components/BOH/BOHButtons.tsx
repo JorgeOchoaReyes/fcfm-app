@@ -16,7 +16,7 @@ export const BOHItem = React.memo(({
   onClickAdd, 
   isFoh
 }: ItemControllerProps) => {
-  const { showChinese } = useStorageP2P();
+  const showChinese = useStorageP2P(state => state.showChinese);
 
   return (
     <TouchableOpacity className={"w-[200px] mx-auto my-1"} onPress={() => {

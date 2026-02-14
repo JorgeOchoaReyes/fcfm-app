@@ -28,6 +28,9 @@ interface DBStorage {
   setDateOfStorage: (date: number) => void;
 }
 
+/**
+ * Creates a storage for the app to use for P2P connections, and general storage for the app.
+ */
 export const useStorageP2P  = create<DBStorage>()(
   persist(
     (set) => ({ 

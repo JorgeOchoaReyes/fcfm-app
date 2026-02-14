@@ -3,7 +3,7 @@ import { View, TouchableOpacity, StyleSheet, Animated } from "react-native";
 import { useStorageP2P } from "hooks/useStorage";
 
 const NearbyStatusBadge = () => {
-  const { connectedPeerId } = useStorageP2P(); 
+  const connectedPeerId = useStorageP2P(state => state.connectedPeerId);
 
   const getStatusColor = () => {
     if (connectedPeerId) return "#52c41a"; 

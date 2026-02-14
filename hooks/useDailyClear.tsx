@@ -2,6 +2,9 @@ import { useEffect } from "react";
 import { useStorageP2P } from "./useStorage";
 import { usePriorityQueue } from "./usePriority-Queue";
 
+/**
+ * Clears the priority queue and the date of storage when the day changes.
+**/
 export const useDailyClear = () => {
   const dateOfStorage = useStorageP2P(state => state.dateOfStorage); 
   const setDateOfStorage = useStorageP2P(state => state.setDateOfStorage);

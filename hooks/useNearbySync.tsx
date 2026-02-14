@@ -2,6 +2,9 @@ import { useState, useEffect, useCallback } from "react";
 import * as Nearby from "expo-nearby-connections";
 import { useStorageP2P } from "../hooks/useStorage";
 
+/**
+ * Handles and stores manual connections for expo-nearby-connections
+ */
 export const useNearbySync = () => {
   const { 
     preferredPeerId, 

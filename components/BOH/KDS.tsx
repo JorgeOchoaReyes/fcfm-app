@@ -116,7 +116,8 @@ export const KDS = ({
   onToggleMenu,
 }: KDSProps) => {
   const [showHistory, setShowHistory] = useState(false);
-  const { showChinese, setShowChinese } = useStorageP2P();
+  const showChinese = useStorageP2P(state => state.showChinese);
+  const setShowChinese = useStorageP2P(state => state.setShowChinese);
  
   
   return (
