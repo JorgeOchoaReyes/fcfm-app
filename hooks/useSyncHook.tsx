@@ -2,25 +2,26 @@ import { useCallback, useEffect, useRef } from "react";
 import { usePriorityQueue } from "./usePriority-Queue";
 import * as Nearby from "expo-nearby-connections"; 
 import { useAudioPlayer } from "expo-audio";
+import { useStorageP2P } from "./useStorage";
 
 const clickSoundSource = require("../assets/bell-sfx.mp3");
 
 export const useStoreSync = (connectedPeerId: string | null) => {
   const isInternalUpdate = useRef(false);
   const player = useAudioPlayer(clickSoundSource);
+  const setIsConnected = useStorageP2P(state => state.setIsConnected);
+  const setConnectedPeerId = useStorageP2P(state => state.setConnectedPeerId);
+  const setConnectedPeerName = useStorageP2P(state => state.setConnectedPeerName);
 
   const playSFX = useCallback(async () => { 
-    try {
-      if (player.isLoaded) {
-        if (player.playing) {
-          player.pause();
-        }
-        await player.seekTo(0);
-        player.play(); 
-      } else {
-        console.warn("Player not loaded");
-      }
+    try { 
+      if (player.playing) {
+        player.pause();
+      } 
+      await player.seekTo(0);
+      player.play();  
     } catch (error) {
+      alert("Error playing SFX");
       console.error("Error playing SFX:", error);
     }
   }, [player]); 
@@ -34,10 +35,18 @@ export const useStoreSync = (connectedPeerId: string | null) => {
         return;
       }  
 
-      await Nearby.sendText(connectedPeerId, JSON.stringify({
-        type: "SYNC_STATE",
-        state: state,  
-      }));
+      try {
+        await Nearby.sendText(connectedPeerId, JSON.stringify({
+          type: "SYNC_STATE",
+          state: state,  
+        }));
+      } catch (e) {
+        setIsConnected(false);
+        setConnectedPeerId(null);
+        setConnectedPeerName("");
+        alert("You are not connected!");
+        console.error("Sync error", e);
+      }
     });
  
     const unsubscribeNearby = Nearby.onTextReceived(async (event) => {
@@ -48,7 +57,7 @@ export const useStoreSync = (connectedPeerId: string | null) => {
           const localState = usePriorityQueue.getState();
  
           if (remoteState.lastUpdated > localState.lastUpdated) {  
-            if(Object.keys(localState.instanceTracker).length < Object.keys(remoteState.instanceTracker).length) {
+            if(Object.keys(remoteState.instanceTracker).length > Object.keys(localState.instanceTracker).length) { 
               await playSFX(); 
             }
             isInternalUpdate.current = true;
@@ -66,5 +75,5 @@ export const useStoreSync = (connectedPeerId: string | null) => {
       unsubscribeStore();
       unsubscribeNearby();
     };
-  }, [connectedPeerId, playSFX]);
+  }, [connectedPeerId, playSFX, setConnectedPeerId, setConnectedPeerName, setIsConnected]);
 };

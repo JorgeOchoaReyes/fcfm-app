@@ -80,8 +80,7 @@ export const useReconnect = () => {
             if (!connectedPeerId) return false;
             await Nearby.sendText(connectedPeerId, "ping");
             return true; 
-          } catch (e) {
-            console.error("Error sending ping in useReconnect:", e);
+          } catch (e) {  
             return false; 
           }
         };
