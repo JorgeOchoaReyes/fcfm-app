@@ -6,6 +6,9 @@ import { useStorageP2P } from "./useStorage";
 
 const clickSoundSource = require("../assets/bell-sfx.mp3");
 
+/**
+ * Syncs the priority queue between peers using expo-nearby-connections and zustand store.
+ */
 export const useStoreSync = (connectedPeerId: string | null) => {
   const isInternalUpdate = useRef(false);
   const player = useAudioPlayer(clickSoundSource);

@@ -4,6 +4,9 @@ import * as Nearby from "expo-nearby-connections";
 import { AppState, AppStateStatus } from "react-native";
 import { usePriorityQueue } from "./usePriority-Queue";
 
+/**
+ * Reconnects to a peer when the app is brought to the foreground or when the connection is lost
+ */
 export const useReconnect = () => {
   const isConnected = useStorageP2P(state => state.isConnected);
   const isSearching = useStorageP2P(state => state.isSearching);
@@ -81,6 +84,7 @@ export const useReconnect = () => {
             await Nearby.sendText(connectedPeerId, "ping");
             return true; 
           } catch (e) {  
+            console.error("Error sending ping in useReconnect: ", e);
             return false; 
           }
         };
@@ -126,6 +130,6 @@ export const useReconnect = () => {
       appStateSub.remove();
       if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current);
     };
-  }, [setIsConnected, setIsSearching, setConnectedPeerId, setConnectedPeerName, isConnected, attemptReconnect, isSearching, isHub]);
+  }, [setIsConnected, setIsSearching, setConnectedPeerId, setConnectedPeerName, isConnected, attemptReconnect, isSearching, isHub, connectedPeerId]);
   
 };

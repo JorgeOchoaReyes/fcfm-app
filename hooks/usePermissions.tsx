@@ -26,6 +26,9 @@ const requestLocationNeabyDevicesPermission = async () => {
   }
 };
 
+/**
+ * Requests multiple permissions for the app to use location, camera, and nearby devices for expo-neraby-connections
+ */
 export const usePermissions = () => {
   useEffect(() => { 
     requestLocationNeabyDevicesPermission(); 

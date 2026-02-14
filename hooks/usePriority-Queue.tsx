@@ -33,6 +33,9 @@ const getCategory = (item: Item) => {
   }
 };
 
+/**
+ * Creates a priority queue for items based on pending, waiting, and in-progress.
+ */
 export const usePriorityQueue = create<PriorityQueueStorage>()(
   persist(
     (set) => ({ 

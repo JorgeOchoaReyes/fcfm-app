@@ -127,7 +127,7 @@ export default function ConnectionPicker() {
         </View>
       </View>
     );
-  }, [connectedPeerId, handleDisconnect, handleRequestConnection]);
+  }, [clearDiscoveredPeers, connectedPeerId, handleDisconnect, handleRequestConnection]);
 
   return (
     <View style={styles.container}>
