@@ -7,7 +7,7 @@ import { items as staticItems, ItemViewType } from "../util/constants";
 import { BOHItem } from "../components/BOH/BOHButtons";
 
 export default function Home() {
-  const [isMenuCollapsed, setIsMenuCollapsed] = React.useState(false);
+  const [isMenuCollapsed, setIsMenuCollapsed] = React.useState(true);
   const { pendingItems, inProgressItems, waitingItems, history } = usePriorityQueue(
     useShallow((state) => ({
       pendingItems: state.pendingItems,

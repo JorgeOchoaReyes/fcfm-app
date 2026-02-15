@@ -8,7 +8,6 @@ import { useReconnect } from "../hooks/useReconnect";
 import { useDailyClear } from "hooks/useDailyClear";
 import { usePermissions } from "hooks/usePermissions";
 
-
 export default function RootLayout() {
   const router = useRouter();
   const pathname = usePathname(); 
