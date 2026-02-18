@@ -22,9 +22,7 @@ export default function Home() {
   const updateBatchSize = usePriorityQueue(state => state.updateBatchSize);
 
   const handleAdd = useCallback((item: ItemViewType, batch: number) => {
-    let target = pendingItems.find(i => i.code === item.code) || 
-                 waitingItems.find(i => i.code === item.code);
-    
+    let target = pendingItems.find(i => i.code === item.code) || waitingItems.find(i => i.code === item.code);
     if (target) {
       updateBatchSize(item.code, batch);
     } else {
