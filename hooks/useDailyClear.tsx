@@ -11,10 +11,12 @@ export const useDailyClear = () => {
   const clearPriorityQueue = usePriorityQueue(state => state.clearPriorityQueue);
 
   useEffect(() => {  
-    const intervalId = setInterval(() => {  
-      const isNewDay = dateOfStorage !== new Date().getDate();
+    const intervalId = setInterval(() => {   
+      const date = new Date();
+      date.setHours(date.getHours() - 8);
+      const isNewDay = dateOfStorage !== date.getDate();
       if (isNewDay) { 
-        setDateOfStorage(new Date().getDate());
+        setDateOfStorage(date.getDate());
         clearPriorityQueue();
       }
     }, 60 * 60 * 1000);
