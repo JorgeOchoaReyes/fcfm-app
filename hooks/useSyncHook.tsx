@@ -14,7 +14,7 @@ export const useStoreSync = (connectedPeerId: string | null) => {
   const player = useAudioPlayer(clickSoundSource);
   const setIsConnected = useStorageP2P(state => state.setIsConnected);
   const setConnectedPeerId = useStorageP2P(state => state.setConnectedPeerId);
-  const setConnectedPeerName = useStorageP2P(state => state.setConnectedPeerName);
+  const setConnectedPeerName = useStorageP2P(state => state.setConnectedPeerName); 
 
   const playSFX = useCallback(async () => { 
     try { 

@@ -20,6 +20,7 @@ export default function Home() {
   const markWaiting = usePriorityQueue(state => state.markWaiting);
   const unmarkWaiting = usePriorityQueue(state => state.unmarkWaiting);
   const updateBatchSize = usePriorityQueue(state => state.updateBatchSize);
+  const remove = usePriorityQueue(state => state.remove);
 
   const handleAdd = useCallback((item: ItemViewType, batch: number) => {
     let target = pendingItems.find(i => i.code === item.code) || waitingItems.find(i => i.code === item.code);
@@ -39,6 +40,10 @@ export default function Home() {
       });
     }
   }, [add, updateBatchSize, pendingItems, waitingItems]);
+
+  const handleRemove = useCallback((code: string) => {
+    remove(code);
+  }, [remove]);
 
   const handleMarkWaiting = useCallback((code: string) => {
     markWaiting(code);
@@ -78,6 +83,7 @@ export default function Home() {
           history={history.sort((a, b) => b.createdAt - a.createdAt)} 
           markWaiting={handleMarkWaiting}
           unmarkWaiting={handleUnmarkWaiting}
+          remove={handleRemove}
         />
       </View>
     </View>

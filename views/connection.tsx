@@ -36,6 +36,7 @@ export default function ConnectionPicker() {
   } = useNearbySync();
   const clearPriorityQueue = usePriorityQueue(state => state.clearPriorityQueue);
   const dateOfStorage = useStorageP2P(state => state.dateOfStorage);
+  const setDateOfStorage = useStorageP2P(state => state.setDateOfStorage);
   
   const [isEditingId, setIsEditingId] = useState(false);
   const [tempDeviceId, setTempDeviceId] = useState(deviceId);
@@ -136,7 +137,8 @@ export default function ConnectionPicker() {
           <Text style={styles.headerSubtitle}>FCFM Network</Text>
           <Text style={styles.headerTitle}>Connections</Text>
           <Text style={{fontSize: 12, color: "#4A90E2"}}>Date of Storage: {dateOfStorage} </Text>
-          <Text style={{fontSize: 12, color: "#4A90E2"}}>Version: 1:03 02/14/2026 </Text>
+          <Text style={{fontSize: 12, color: "#4A90E2"}}>Version: 12:11 02/19/2026 </Text>
+          <Text style={{fontSize: 12, color: "#4A90E2"}}>Current time: {`${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`} </Text>
         </View>
         <TouchableOpacity style={styles.refreshCircle} onPress={handleStartP2P} disabled={isSearching}>
           {isSearching ? (
@@ -179,17 +181,9 @@ export default function ConnectionPicker() {
             borderRadius: 10, 
             alignItems: "center",
           }} onPress={async () => {
-            if (!connectedPeerId) {
-              alert("Connect to a peer first");
-              return;
-            }
-            try{
-              await Nearby.sendText(connectedPeerId, "This a test message!");
-            }catch(e){
-              alert("Error sending message: " + e);
-            }
+            setDateOfStorage(new Date().getDate() + 1);
           }}>
-            <Text style={{...styles.sectionTitle, color: "white"}}>Test Send Payload</Text>
+            <Text style={{...styles.sectionTitle, color: "white"}}>Update Date of Storage</Text>
           </TouchableOpacity>
         </View> 
 
