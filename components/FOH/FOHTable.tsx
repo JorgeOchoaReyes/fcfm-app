@@ -1,7 +1,7 @@
 import React, { memo , useState } from "react";
 import { Item } from "../../types"; 
 import { Timer } from "../Timer";
-
+import { Ionicons } from "@expo/vector-icons";
 import { View, TouchableOpacity, Text, FlatList }  from "react-native"; 
 
 const assignBgTheme = (item: Item): string => {
@@ -54,11 +54,13 @@ const KDSItemView = memo(({
   itemCompleted = false,
   onPress,
   unmarkWaiting,
+  remove,
 }: {
   item: Item;
   itemCompleted: boolean; 
   onPress: () => void;
   unmarkWaiting: (code: string) => void;
+  remove: (code: string) => void;
 }) => { 
   const completed = itemCompleted;
 
@@ -68,13 +70,13 @@ const KDSItemView = memo(({
         item.waiting ? () => unmarkWaiting(item.code) : () => onPress()
       }
       delayPressIn={0}
-      className={`flex flex-row items-center p-2 rounded-xl ${completed ? "bg-slate-200 text-black" : assignBgTheme(item)}`}
+      className={`flex flex-row items-center p-2 rounded-xl ${(completed || item.status === "deleted") ? "bg-slate-200 text-black" : assignBgTheme(item)}`}
     >
       <View className="flex-[1] items-center font-bold"><Text className={`text-2xl font-bold ${textTheme(item)}`} numberOfLines={1}>{item.code}</Text></View>
       <View className="flex-[2] items-center"><Text className={`text-2xl font-bold ${textTheme(item)}`}>#{item.batchSize}</Text></View>
       <View className="flex-[2] items-center">
         {
-          completed ? <Text className="text-xl text-slate-400">--:--</Text> : <Timer 
+          (completed || item.status === "deleted") ? <Text className="text-xl text-slate-400">--:--</Text> : <Timer 
             textSize="text-2xl"
             textColor={textTheme(item)} 
             startTimestamp={item.createdAt} 
@@ -83,6 +85,18 @@ const KDSItemView = memo(({
       </View>
       <View className="flex-[1] items-center"><Text className={"text-2xl"}>{item.waiting ? "⚠️" : " "}</Text></View>
       <View className="flex-[2] items-center"><Text className={`text-xl capitalize ${textTheme(item)}`}>{item.status === "in-progress" ? "cooking" : item.status}</Text></View>
+      {
+        !(completed || item.status === "deleted") && (
+          <TouchableOpacity
+            onPress={() => remove(item.code)}
+            delayPressIn={0}
+            className="flex-[1] items-center"
+          >
+            <Ionicons name="trash" size={24} color={
+              item.waiting ? "white" : "red"
+            } />
+          </TouchableOpacity>)
+      }
     </TouchableOpacity>
   );
 });
@@ -92,6 +106,7 @@ interface FOHTableViewProps {
   history: Item[]; 
   markWaiting: (code: string) => void;
   unmarkWaiting: (code: string) => void;
+  remove: (code: string) => void;
 }
 
 export const FOHTableView = ({
@@ -99,6 +114,7 @@ export const FOHTableView = ({
   history, 
   markWaiting,
   unmarkWaiting,
+  remove
 }: FOHTableViewProps) => {
   const [showHistory, setShowHistory] = useState(false);
   return (
@@ -113,11 +129,12 @@ export const FOHTableView = ({
         </TouchableOpacity> 
       </View> 
       <View className="flex flex-row items-center px-4 mb-2 pb-2 border-b border-slate-300">
-        <Text className="flex-[4] font-bold text-slate-500 uppercase text-xs">Item</Text>
-        <Text className="flex-[1] font-bold text-slate-500 uppercase text-xs text-center">Batch</Text>
+        <Text className="flex-[1] font-bold text-slate-500 uppercase text-xs">Item</Text>
+        <Text className="flex-[2] font-bold text-slate-500 uppercase text-xs text-center">Batch</Text>
         <Text className="flex-[2] font-bold text-slate-500 uppercase text-xs text-center">Time</Text>
         <Text className="flex-[1] font-bold text-slate-500 uppercase text-xs text-center">Wait</Text>
         <Text className="flex-[2] font-bold text-slate-500 uppercase text-xs text-center">Status</Text> 
+        <Text className="flex-[1] font-bold text-slate-500 uppercase text-xs text-center">Delete</Text>
       </View>
       <FlatList
         data={showHistory ? history : items}
@@ -132,6 +149,7 @@ export const FOHTableView = ({
             itemCompleted={item.status === "completed"} 
             onPress={() => markWaiting(item.code)}
             unmarkWaiting={unmarkWaiting}
+            remove={remove}
           />
         )}
       />  

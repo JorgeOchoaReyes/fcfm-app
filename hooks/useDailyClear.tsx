@@ -13,7 +13,7 @@ export const useDailyClear = () => {
   useEffect(() => {  
     const intervalId = setInterval(() => {   
       const date = new Date();
-      date.setHours(date.getHours() - 8);
+      date.setHours(date.getHours()); 
       const isNewDay = dateOfStorage !== date.getDate();
       if (isNewDay) { 
         setDateOfStorage(date.getDate());
@@ -21,6 +21,14 @@ export const useDailyClear = () => {
       }
     }, 60 * 60 * 1000);
     return () => clearInterval(intervalId); 
+
   }, [dateOfStorage, setDateOfStorage, clearPriorityQueue]);
+
+  
+  useEffect(() => {
+    if(!dateOfStorage || dateOfStorage !== new Date().getDate()) {
+      setDateOfStorage(new Date().getDate());
+    }
+  }, []);
 
 };

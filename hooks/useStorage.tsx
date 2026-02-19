@@ -60,12 +60,13 @@ export const useStorageP2P  = create<DBStorage>()(
       clearStorage: () => {
         set({ 
           preferredPeerId: null, 
-          deviceId: "", 
+          // deviceId: "", 
           connectedPeerId: null,
           connectedPeerName: "",
           isSearching: false,
           isConnected: false,
           isHub: false,
+          dateOfStorage: new Date().getDate(),
         });  
       }, 
     }),
