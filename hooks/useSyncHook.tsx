@@ -29,8 +29,7 @@ export const useStoreSync = (connectedPeerId: string | null) => {
     }
   }, [player]); 
 
-  useEffect(() => {
-    if (!connectedPeerId) return;
+  useEffect(() => { 
  
     const unsubscribeStore = usePriorityQueue.subscribe(async (state, prevState) => {
       if (isInternalUpdate.current) {
@@ -39,10 +38,11 @@ export const useStoreSync = (connectedPeerId: string | null) => {
       }  
 
       try {
-        await Nearby.sendText(connectedPeerId, JSON.stringify({
+        await Nearby.sendText(connectedPeerId ?? "", JSON.stringify({
           type: "SYNC_STATE",
           state: state,  
         }));
+        
       } catch (e) {
         setIsConnected(false);
         setConnectedPeerId(null);
@@ -65,9 +65,9 @@ export const useStoreSync = (connectedPeerId: string | null) => {
             }
             isInternalUpdate.current = true;
             usePriorityQueue.setState(remoteState);
-          } else { 
+          } else {  
             console.log("Local is newer, ignoring remote sync.");
-          }
+          } 
         }
       } catch (e) {
         console.error("Sync error", e);
