@@ -32,6 +32,14 @@ export const items = [
     batchServings: { 1: 4.1, 2: 8.2, 3: 12.3 }
   },
   {
+    name: "New Item",
+    code: "NEW",
+    cookTime: "6 mins",
+    kitchenName: "NW",
+    chineseName: "新品",
+    batchServings: { 1: 4.1, 2: 8.2, 3: 12.3 }
+  },
+  {
     name: "Beijing Beef",
     code: "B5",
     cookTime: "5 mins",
@@ -87,30 +95,30 @@ export const items = [
     chineseName: "豆腐",
     batchServings: { 1: 5, 2: 10, 3: 15 }
   },
-  {
-    name: "Veggie Spring Rolls",
-    code: "E1",
-    cookTime: "",
-    kitchenName: "",
-    chineseName: "春卷",
-    batchServings: { 1: 5, 2: 10, 3: 15 }
-  },
-  {
-    name: "Chicken Egg Rolls",
-    code: "E2",
-    cookTime: "",
-    kitchenName: "",
-    chineseName: "鸡卷",
-    batchServings: { 1: 5, 2: 10, 3: 15 }
-  },
-  {
-    name: "Cheese Rangoons",
-    code: "E3",
-    cookTime: "",
-    kitchenName: "",
-    chineseName: "芝士角",
-    batchServings: { 1: 5, 2: 10, 3: 15 }
-  },
+  // {
+  //   name: "Veggie Spring Rolls",
+  //   code: "E1",
+  //   cookTime: "",
+  //   kitchenName: "",
+  //   chineseName: "春卷",
+  //   batchServings: { 1: 5, 2: 10, 3: 15 }
+  // },
+  // {
+  //   name: "Chicken Egg Rolls",
+  //   code: "E2",
+  //   cookTime: "",
+  //   kitchenName: "",
+  //   chineseName: "鸡卷",
+  //   batchServings: { 1: 5, 2: 10, 3: 15 }
+  // },
+  // {
+  //   name: "Cheese Rangoons",
+  //   code: "E3",
+  //   cookTime: "",
+  //   kitchenName: "",
+  //   chineseName: "芝士角",
+  //   batchServings: { 1: 5, 2: 10, 3: 15 }
+  // },
   // {
   //   name: "Teriyaki Chicken",
   //   code: "C4",
