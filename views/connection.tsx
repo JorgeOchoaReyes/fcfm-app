@@ -137,8 +137,7 @@ export default function ConnectionPicker() {
           <Text style={styles.headerSubtitle}>FCFM Network</Text>
           <Text style={styles.headerTitle}>Connections</Text>
           <Text style={{fontSize: 12, color: "#4A90E2"}}>Date of Storage: {dateOfStorage} </Text>
-          <Text style={{fontSize: 12, color: "#4A90E2"}}>Version: 12:55 02/24/2026 </Text>
-          <Text style={{fontSize: 12, color: "#4A90E2"}}>Current time: {`${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`} </Text>
+          <Text style={{fontSize: 12, color: "#4A90E2"}}>Version: 6:09pm 03/03/2026</Text>
         </View>
         <TouchableOpacity style={styles.refreshCircle} onPress={handleStartP2P} disabled={isSearching}>
           {isSearching ? (
