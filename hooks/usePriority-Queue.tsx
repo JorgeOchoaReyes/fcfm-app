@@ -4,6 +4,12 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+interface PriorityQueueAction {
+  type: "ADD" | "REMOVE" | "RECALL" | "MARK_WAITING" | "UNMARK_WAITING" | "UPDATE_STATUS" | "UPDATE_BATCH_SIZE" | "CLEAR";
+  payload: any;
+  timestamp: number;
+}
+
 interface PriorityQueueStorage { 
     inProgressItems: Item[];
     waitingItems: Item[];
@@ -13,6 +19,7 @@ interface PriorityQueueStorage {
     waitingTracker: { [key: string]: boolean }; 
   lastUpdated: number;
   date: string; 
+  lastAction?: PriorityQueueAction;
   add: (value: Item) => void;
   remove: (code: string) => void 
   recall: (itemId: number) => void; 
@@ -45,6 +52,7 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
       history: [],
       instanceTracker: {} as { [key: string]: boolean },
       waitingTracker: {} as { [key: string]: boolean }, 
+      lastAction: { type: "CLEAR", payload: null, timestamp: Date.now() },
       lastUpdated: Date.now(),
       date: getFormattedDate(), 
       add: (value: Item) => {
@@ -60,7 +68,8 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
             waitingItems: value.status === "waiting" ? [...state.waitingItems, value] : state.waitingItems,
             pendingItems: (value.status !== "in-progress" && value.status !== "waiting") ? [...state.pendingItems, value] : state.pendingItems,
             instanceTracker: { ...state.instanceTracker, [value.code]: true },
-            lastUpdated: Date.now()
+            lastUpdated: Date.now(),
+            lastAction: { type: "ADD", payload: value, timestamp: Date.now() }
           };
         });
       },
@@ -89,7 +98,8 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
               history: [...newPq.history, historyItem].slice(-100),
               instanceTracker,
               waitingTracker,
-              lastUpdated: Date.now()
+              lastUpdated: Date.now(),
+              lastAction: { type: "REMOVE", payload: code, timestamp: Date.now() }
             };
           }
           return state;
@@ -123,7 +133,8 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
             pendingItems: category === "pending" ? [...state.pendingItems, updatedTarget] : state.pendingItems,
             instanceTracker: { ...state.instanceTracker, [target.code]: true },
             waitingTracker: { ...state.waitingTracker, [target.code]: waiting },
-            lastUpdated: Date.now()
+            lastUpdated: Date.now(),
+            lastAction: { type: "RECALL", payload: itemId, timestamp: Date.now() }
           };
         });
       },
@@ -154,7 +165,8 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
           return { 
             ...newPq,
             waitingTracker: { ...pq.waitingTracker, [code]: true },
-            lastUpdated: Date.now()
+            lastUpdated: Date.now(),
+            lastAction: { type: "MARK_WAITING", payload: code, timestamp: Date.now() }
           };
         });
       },
@@ -168,7 +180,8 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
               ...pq,
               pendingItems: pq.pendingItems.filter(i => i.code !== code),
               inProgressItems: [...pq.inProgressItems, { ...item, status: "in-progress", startedAt: Date.now() }],
-              lastUpdated: Date.now()
+              lastUpdated: Date.now(),
+              lastAction: { type: "UPDATE_STATUS", payload: code, timestamp: Date.now() }
             };
           } else if (pq.inProgressItems.some(i => i.code === code)) {
             const item = pq.inProgressItems.find(i => i.code === code)!;
@@ -180,7 +193,8 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
               history: [...pq.history, { ...item, status: "completed" as const, completedAt: Date.now() }].slice(-100),
               instanceTracker,
               waitingTracker,
-              lastUpdated: Date.now()
+              lastUpdated: Date.now(),
+              lastAction: { type: "UPDATE_STATUS", payload: code, timestamp: Date.now() }
             };
           } else if (pq.waitingItems.some(i => i.code === code)) {
             const item = pq.waitingItems.find(i => i.code === code)!;
@@ -188,7 +202,8 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
               ...pq,
               waitingItems: pq.waitingItems.filter(i => i.code !== code),
               inProgressItems: [...pq.inProgressItems, { ...item, status: "in-progress", startedAt: Date.now() }],
-              lastUpdated: Date.now()
+              lastUpdated: Date.now(),
+              lastAction: { type: "UPDATE_STATUS", payload: code, timestamp: Date.now() }
             };
           }
 
@@ -203,7 +218,8 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
           history: [],
           instanceTracker: {},
           waitingTracker: {},
-          lastUpdated: Date.now()
+          lastUpdated: Date.now(),
+          lastAction: { type: "CLEAR", payload: null, timestamp: Date.now() }
         });
       },
       unmarkWaiting: (code: string) => {
@@ -228,7 +244,8 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
               ...newPq,
               waitingTracker: remainingWaiting,
               pendingItems: [...newPq.pendingItems, { ...target, waiting: false, markedWaitingAt: undefined }], 
-              lastUpdated: Date.now()
+              lastUpdated: Date.now(),
+              lastAction: { type: "UNMARK_WAITING", payload: code, timestamp: Date.now() }
             };
           }
 
@@ -260,7 +277,8 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
               waitingItems: category === "waiting" ? [...newPq.waitingItems, updatedTarget] : newPq.waitingItems,
               pendingItems: category === "pending" ? [...newPq.pendingItems, updatedTarget] : newPq.pendingItems,
               instanceTracker: { ...newPq.instanceTracker, [target.code]: true },
-              lastUpdated: Date.now()
+              lastUpdated: Date.now(),
+              lastAction: { type: "UPDATE_BATCH_SIZE", payload: { code, batchSize }, timestamp: Date.now() }
             };
           }
 

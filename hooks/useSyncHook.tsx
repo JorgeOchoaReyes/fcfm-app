@@ -59,7 +59,7 @@ export const useStoreSync = (connectedPeerId: string | null) => {
           const remoteState = payload.state;
           const localState = usePriorityQueue.getState();
  
-          if (remoteState.lastUpdated > localState.lastUpdated) {  
+          if (remoteState.lastUpdated > localState.lastUpdated || localState.lastAction !== remoteState.lastAction) {  
             if(Object.keys(remoteState.instanceTracker).length > Object.keys(localState.instanceTracker).length) { 
               await playSFX(); 
             }
