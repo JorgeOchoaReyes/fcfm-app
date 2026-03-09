@@ -95,36 +95,38 @@ export const items = [
     chineseName: "豆腐",
     batchServings: { 1: 5, 2: 10, 3: 15 }
   },
-  // {
-  //   name: "Veggie Spring Rolls",
-  //   code: "E1",
-  //   cookTime: "",
-  //   kitchenName: "",
-  //   chineseName: "春卷",
-  //   batchServings: { 1: 5, 2: 10, 3: 15 }
-  // },
-  // {
-  //   name: "Chicken Egg Rolls",
-  //   code: "E2",
-  //   cookTime: "",
-  //   kitchenName: "",
-  //   chineseName: "鸡卷",
-  //   batchServings: { 1: 5, 2: 10, 3: 15 }
-  // },
-  // {
-  //   name: "Cheese Rangoons",
-  //   code: "E3",
-  //   cookTime: "",
-  //   kitchenName: "",
-  //   chineseName: "芝士角",
-  //   batchServings: { 1: 5, 2: 10, 3: 15 }
-  // },
-  // {
-  //   name: "Teriyaki Chicken",
-  //   code: "C4",
-  //   cookTime: "10 mins",
-  //   batchServings: { 1: 6.5, 2: 13, 3: 19.5 }
-  // }
+  {
+    name: "Veggie Spring Rolls",
+    code: "E1",
+    cookTime: "",
+    kitchenName: "",
+    chineseName: "春卷",
+    batchServings: { 1: 5, 2: 10, 3: 15 }
+  },
+  {
+    name: "Chicken Egg Rolls",
+    code: "E2",
+    cookTime: "",
+    kitchenName: "",
+    chineseName: "鸡卷",
+    batchServings: { 1: 5, 2: 10, 3: 15 }
+  },
+  {
+    name: "Cheese Rangoons",
+    code: "E3",
+    cookTime: "",
+    kitchenName: "",
+    chineseName: "芝士角",
+    batchServings: { 1: 5, 2: 10, 3: 15 }
+  },
+  {
+    name: "Teriyaki Chicken",
+    code: "C4",
+    cookTime: "10 mins",
+    kitchenName: "TERI",
+    chineseName: "照烧鸡",
+    batchServings: { 1: 6.5, 2: 13, 3: 19.5 }
+  }
 ];
 
 export type ItemViewType = typeof items[0];
