@@ -5,8 +5,10 @@ import { FOHTableView } from "../components/FOH/FOHTable";
 import React, { useMemo, useCallback } from "react";
 import { BOHItem } from "../components/BOH/BOHButtons";
 import { useShallow } from "zustand/react/shallow";
+import { useStorageP2P } from "../hooks/useStorage";
 
 export default function Home() {
+  const hiddenItems = useStorageP2P(state => state.hiddenItems);
   const { pendingItems, inProgressItems, waitingItems, history } = usePriorityQueue(
     useShallow((state) => ({
       pendingItems: state.pendingItems,
@@ -65,7 +67,7 @@ export default function Home() {
         <FlatList
           keyExtractor={(item) => item.code}
           numColumns={2}  
-          data={items} 
+          data={items.filter(item => !hiddenItems?.includes?.(item.code))} 
           scrollEnabled
           renderItem={({ item }) => (
             <BOHItem

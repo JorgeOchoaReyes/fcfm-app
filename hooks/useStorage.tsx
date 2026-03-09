@@ -14,6 +14,7 @@ interface DBStorage {
   isConnected: boolean;
   isHub: boolean;
   showChinese: boolean;
+  hiddenItems: string[];
   dateOfStorage: number;
  
   setIsConnected: (connected: boolean) => void;
@@ -25,6 +26,7 @@ interface DBStorage {
   clearStorage: () => void; 
   setIsHub: (hub: boolean) => void;
   setShowChinese: (showChinese: boolean) => void;
+  toggleHiddenItem: (code: string) => void;
   setDateOfStorage: (date: number) => void;
 }
 
@@ -42,12 +44,18 @@ export const useStorageP2P  = create<DBStorage>()(
       isConnected: false,
       isHub: false,
       showChinese: false,
+      hiddenItems: [],
       dateOfStorage: new Date().getDate(),
 
       setDateOfStorage: (date: number) => set({ dateOfStorage: date }),
        
       setDeviceId: (id: string) => set({ deviceId: id }),
       setShowChinese: (showChinese: boolean) => set({ showChinese: showChinese }),
+      toggleHiddenItem: (code: string) => set((state) => ({ 
+        hiddenItems: state.hiddenItems.includes(code) 
+          ? state.hiddenItems.filter(c => c !== code) 
+          : [...state.hiddenItems, code] 
+      })),
 
       setConnectedPeerId: (id: string | null) => set({ connectedPeerId: id }),
       setConnectedPeerName: (name: string) => set({ connectedPeerName: name }),
@@ -66,6 +74,7 @@ export const useStorageP2P  = create<DBStorage>()(
           isSearching: false,
           isConnected: false,
           isHub: false,
+          hiddenItems: [],
           dateOfStorage: new Date().getDate(),
         });  
       }, 

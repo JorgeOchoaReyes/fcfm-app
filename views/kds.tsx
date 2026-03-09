@@ -5,8 +5,10 @@ import { useShallow } from "zustand/react/shallow";
 import { KDS } from "../components/BOH/KDS";  
 import { items as staticItems, ItemViewType } from "../util/constants"; 
 import { BOHItem } from "../components/BOH/BOHButtons";
+import { useStorageP2P } from "../hooks/useStorage";
 
 export default function Home() {
+  const hiddenItems = useStorageP2P(state => state.hiddenItems);
   const [isMenuCollapsed, setIsMenuCollapsed] = React.useState(true);
   const { pendingItems, inProgressItems, waitingItems, history } = usePriorityQueue(
     useShallow((state) => ({
@@ -72,7 +74,7 @@ export default function Home() {
           <FlatList
             keyExtractor={(item) => item.code}
             numColumns={2}  
-            data={staticItems} 
+            data={staticItems.filter(item => !hiddenItems?.includes?.(item.code))} 
             scrollEnabled
             columnWrapperStyle={{ gap: 10 }}
             renderItem={({ item }) => (

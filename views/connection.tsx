@@ -1,11 +1,12 @@
 import React, { useState, useCallback } from "react";
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, ActivityIndicator } from "react-native";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, ActivityIndicator, ScrollView } from "react-native";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import * as Nearby from "expo-nearby-connections";
 import { useStorageP2P } from "../hooks/useStorage";
 import { useNearbySync } from "../hooks/useNearbySync";
 import { usePriorityQueue } from "hooks/usePriority-Queue";
 import { useShallow } from "zustand/react/shallow";
+import { items } from "../util/constants";
 
 export default function ConnectionPicker() {
   const { 
@@ -15,7 +16,9 @@ export default function ConnectionPicker() {
     connectedPeerName,  
     setDeviceId, 
     setIsHub, 
-    clearStorage 
+    clearStorage,
+    hiddenItems,
+    toggleHiddenItem
   } = useStorageP2P(useShallow(state => ({
     isHub: state.isHub,
     deviceId: state.deviceId,
@@ -23,7 +26,9 @@ export default function ConnectionPicker() {
     connectedPeerName: state.connectedPeerName,
     setDeviceId: state.setDeviceId,
     setIsHub: state.setIsHub,
-    clearStorage: state.clearStorage
+    clearStorage: state.clearStorage,
+    hiddenItems: state.hiddenItems,
+    toggleHiddenItem: state.toggleHiddenItem
   })));
 
   const { 
@@ -131,13 +136,13 @@ export default function ConnectionPicker() {
   }, [clearDiscoveredPeers, connectedPeerId, handleDisconnect, handleRequestConnection]);
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       <View style={styles.header}>
         <View>
           <Text style={styles.headerSubtitle}>FCFM Network</Text>
           <Text style={styles.headerTitle}>Connections</Text>
           <Text style={{fontSize: 12, color: "#4A90E2"}}>Date of Storage: {dateOfStorage} </Text>
-          <Text style={{fontSize: 12, color: "#4A90E2"}}>Version: 6:09pm 03/03/2026</Text>
+          <Text style={{fontSize: 12, color: "#4A90E2"}}>Version: 01:16am 03/09/2026</Text>
         </View>
         <TouchableOpacity style={styles.refreshCircle} onPress={handleStartP2P} disabled={isSearching}>
           {isSearching ? (
@@ -295,7 +300,41 @@ export default function ConnectionPicker() {
           }
         />
       </View>
-    </View>
+
+      
+      <View style={styles.myDeviceSection}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Item Visibility</Text>
+        </View>
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          scrollEnabled={false}
+          numColumns={3}
+          data={items}
+          keyExtractor={(item) => item.code}
+          renderItem={({ item }) => {
+            const isHidden = hiddenItems?.includes?.(item.code) || false;
+            return (
+              <TouchableOpacity
+                style={[styles.visibilityChip, isHidden && styles.visibilityChipHidden]}
+                onPress={() => toggleHiddenItem(item.code)}
+              >
+                <Text style={[styles.visibilityChipText, isHidden && styles.visibilityChipTextHidden]}>
+                  {item.name}
+                </Text>
+                <Ionicons 
+                  name={isHidden ? "eye-off" : "eye"} 
+                  size={16} 
+                  color={isHidden ? "#9E9E9E" : "#fff"} 
+                  style={{ marginLeft: 6 }}
+                />
+              </TouchableOpacity>
+            );
+          }}
+          columnWrapperStyle={styles.gridColumnWrapper}
+        />
+      </View>
+    </ScrollView>
   );
 }
 
@@ -303,8 +342,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F8F9FA",
-    overflow: "scroll",
-    height: "100%",
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 40,
   },
   header: {
     flexDirection: "row",
@@ -357,6 +398,32 @@ const styles = StyleSheet.create({
   editAction: {
     color: "#4A90E2",
     fontWeight: "600",
+  },
+  visibilityChip: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#4A90E2",
+    paddingHorizontal: 8,
+    paddingVertical: 10,
+    borderRadius: 12,
+    marginHorizontal: 4,
+    marginBottom: 8,
+  },
+  gridColumnWrapper: {
+    justifyContent: "space-between",
+  },
+  visibilityChipHidden: {
+    backgroundColor: "#E0E0E0",
+  },
+  visibilityChipText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 14,
+  },
+  visibilityChipTextHidden: {
+    color: "#9E9E9E",
   },
   idCard: {
     flexDirection: "row",
