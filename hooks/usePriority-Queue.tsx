@@ -10,7 +10,7 @@ interface PriorityQueueAction {
   timestamp: number;
 }
 
-interface PriorityQueueStorage { 
+export interface PriorityQueueStorage { 
     inProgressItems: Item[];
     waitingItems: Item[];
     pendingItems: Item[];
@@ -42,6 +42,8 @@ const getCategory = (item: Item) => {
 
 /**
  * Creates a priority queue for items based on pending, waiting, and in-progress.
+ * 
+ * 
  */
 export const usePriorityQueue = create<PriorityQueueStorage>()(
   persist(
