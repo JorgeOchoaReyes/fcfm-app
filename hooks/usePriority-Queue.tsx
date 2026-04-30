@@ -91,7 +91,7 @@ export const usePriorityQueue = create<PriorityQueueStorage>()(
           }
 
           if (removedItem) {
-            const historyItem = { ...removedItem, status: "deleted" as const };
+            const historyItem = { ...removedItem, status: "deleted" as const, deletedAt: Date.now() };
             const { [code]: _, ...instanceTracker } = newPq.instanceTracker;
             const { [code]: __, ...waitingTracker } = newPq.waitingTracker;
             
